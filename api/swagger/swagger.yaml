@@ -1,0 +1,139 @@
+swagger: "2.0"
+info:
+  version: "0.0.1"
+  title: Syba-Backend
+# during dev, should point to your local machine
+host: localhost:8080
+# basePath prefixes all resource paths 
+basePath: /api/
+# 
+schemes:
+  # tip: remove http to make production-grade
+  - http
+  - https
+# format of bodies a client can send (Content-Type)
+consumes:
+  - application/json
+# format of the responses to the client (Accepts)
+produces:
+  - application/json
+paths:
+  /swagger:
+    x-swagger-pipe: swagger_raw
+  /batches:
+    x-swagger-router-controller: batches
+    get: 
+      description: Returns all known batches
+      parameters: 
+        - name: filter
+          in: query
+          description: Where clause to get only certain batches
+          required: false
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: array
+            items: 
+              # a pointer to a definition
+              $ref: "#/definitions/Batch"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /runs:
+    x-swagger-router-controller: batches
+    get: 
+      description: Returns all known runs
+      parameters: 
+        - name: filter
+          in: query
+          description: Where clause to get only certain batches
+          required: false
+          type: string
+        - name: batch
+          in: query
+          description: the boid of the batch to return the runs for
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: array
+            items: 
+              # a pointer to a definition
+              $ref: "#/definitions/Run"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /users:
+    x-swagger-router-controller: batches
+    get: 
+      description: Returns all known users
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: array
+            items: 
+              # a pointer to a definition
+              $ref: "#/definitions/User"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
+# complex objects have schema definitions
+definitions:
+  ErrorResponse:
+    required:
+      - message
+    properties:
+      message:
+        type: string
+  Batch:
+    type: object
+    required:
+      - boid
+      - name
+      - description
+    properties:
+      boid:
+        type: string
+      name: 
+        type: string
+      description: 
+        type: string
+  Run:
+    type: object
+    required: 
+      - boid
+    properties: 
+      boid:
+        type: string
+      batch:
+        type: string
+      starttime:
+        type: string
+        format: date-time
+      endtime: 
+        type: string
+        format: date-time
+  User:
+    type: object
+    required: 
+      - id
+    properties:
+      firstname: 
+        type: string
+      lastname: 
+        type: string
+      id: 
+        type: string
+        

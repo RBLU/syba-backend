@@ -1,0 +1,23 @@
+{
+  "name": "syba-backend",
+  "version": "0.0.1",
+  "private": true,
+  "description": "New Swagger API Project",
+  "keywords": [],
+  "author": "",
+  "license": "",
+  "main": "app.js",
+  "dependencies": {
+    "oracledb": "^1.12.2",
+    "restify": "^4.0.2",
+    "swagger-restify-mw": "^0.7.0"
+  },
+  "devDependencies": {
+    "should": "^11.2.0",
+    "supertest": "^2.0.1"
+  },
+  "scripts": {
+    "start": "node app.js",
+    "test": "swagger project test"
+  }
+}
