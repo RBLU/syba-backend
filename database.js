@@ -83,7 +83,7 @@ let createSybaSchema = function() {
               .catch((err) => {
                 conn.close();
                 if (_.startsWith(err.message, 'ORA-00955')) {
-                  console.log("Database: Table already exists, skipping: " + filename);
+                  console.log("Database: " + err.message + ": "+ filename);
                   return;
                 }
                 console.log("Error while executing: " + content);

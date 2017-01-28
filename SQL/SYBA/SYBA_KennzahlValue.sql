@@ -6,7 +6,8 @@ BEGIN
   itsBatchConfig VARCHAR (40),
   itsBatch VARCHAR (40),
   numberValue NUMBER (10, 2),
-  timestampValue TIMESTAMP
+  timestampValue TIMESTAMP,
+  CONSTRAINT kz_boid unique(boid)
   )';
 
   EXECUTE IMMEDIATE 'CREATE INDEX kz_batchconfig

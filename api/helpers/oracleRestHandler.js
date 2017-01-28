@@ -39,7 +39,7 @@ let getGenericHandler = function (tableName, poolname) {
               conn.close();
               if (result.rows.length == 0) {
                 return next(new restify.NotFoundError("Object not found with id: " + id));
-              } else {
+              } else if (result.rows.length > 1){
                 return next(new restify.InternalServerError("got more than one object, not expected"));
               }
               return next(null, result.rows[0]);
@@ -83,6 +83,7 @@ let getGenericHandler = function (tableName, poolname) {
         });
     },
     delete: function (req, res, next) {
+      throw new Error("not implemented yet");
     },
     post: function (req, res, next) {
       oracledb.getConnection(poolname)
