@@ -4,4 +4,4 @@ CREATE Table SYBA.BATCHCONFIG (
   name varchar(100),
   description varchar(100),
   active number(1)
-);
+)

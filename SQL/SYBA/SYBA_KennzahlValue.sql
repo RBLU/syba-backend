@@ -1,13 +1,18 @@
-CREATE TABLE SYBA.kennzahlvalue (
-  boid varchar(40),
-  itsBatchRun varchar(40),
-  itsKennzahlConfig varchar(40),
-  itsBatchConfig varchar(40),
-  itsBatch varchar(40),
-  numberValue number(10,2),
-  timestampValue timestamp
-);
+BEGIN
+  EXECUTE IMMEDIATE 'CREATE TABLE SYBA.kennzahlvalue (
+  boid VARCHAR (40),
+  itsBatchRun VARCHAR (40),
+  itsKennzahlConfig VARCHAR (40),
+  itsBatchConfig VARCHAR (40),
+  itsBatch VARCHAR (40),
+  numberValue NUMBER (10, 2),
+  timestampValue TIMESTAMP
+  )';
 
-CREATE INDEX kz_batchconfig on SYBA.kennzahlvalue(itsBatchConfig);
-CREATE INDEX kz_batchrun on SYBA.kennzahlvalue(itsBatchRun);
-CREATE INDEX kz_kennzahlconfig on SYBA.kennzahlvalue(itsKennzahlConfig);
+  EXECUTE IMMEDIATE 'CREATE INDEX kz_batchconfig
+  ON SYBA.kennzahlvalue (itsBatchConfig)';
+  EXECUTE IMMEDIATE 'CREATE INDEX kz_batchrun
+  ON SYBA.kennzahlvalue (itsBatchRun)';
+  EXECUTE IMMEDIATE 'CREATE INDEX kz_kennzahlconfig
+  ON SYBA.kennzahlvalue (itsKennzahlConfig)';
+END;

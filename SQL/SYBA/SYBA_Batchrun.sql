@@ -4,4 +4,4 @@ CREATE Table SYBA.BATCHRUN (
   itsBatch varchar(40),
   started timestamp,
   ended timestamp
-);
+)

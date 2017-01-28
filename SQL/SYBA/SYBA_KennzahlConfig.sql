@@ -12,4 +12,4 @@ CREATE Table SYBA.KENNZAHLCONFIG (
   levelNormal number(10,2),
   levelHighWarning number(10,2),
   levelMax number(10,2)
-);
+)

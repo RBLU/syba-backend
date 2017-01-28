@@ -4,4 +4,4 @@ CREATE Table SYBA.BATCHPARAM (
   paramname varchar(40),
   paramclause varchar(100),
   active number(1)
-);
+)
