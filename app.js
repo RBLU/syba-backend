@@ -7,7 +7,6 @@ var db = require('./database');
 
 var app = restify.createServer();
 
-
 module.exports = app; // for testing
 
 var config = {
@@ -20,7 +19,6 @@ db.init()
       if (err) {
         throw err;
       }
-
       swaggerRestify.register(app);
 
 

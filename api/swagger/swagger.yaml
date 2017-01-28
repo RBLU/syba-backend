@@ -43,6 +43,43 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+    post:
+      description: posts a new batch
+      parameters: 
+        - name: batch
+          in: body
+          description: the batch to store
+          required: true
+          schema: 
+            $ref: "#/definitions/Batch"
+      responses:
+        "200":
+          description: Success
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"      
+  /batches/{id}:
+    x-swagger-router-controller: batches
+    get:
+      description: Returns one batch by name
+      operationId: getById
+      parameters:
+        - name: id
+          in: path
+          description: boid of batch to fetch
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/Batch"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /runs:
     x-swagger-router-controller: batches
     get: 
@@ -103,6 +140,7 @@ definitions:
       - boid
       - name
       - description
+      - itsSyriusBatch
     properties:
       boid:
         type: string
@@ -110,6 +148,10 @@ definitions:
         type: string
       description: 
         type: string
+      itsSyriusBatch:
+        type: string
+      active:
+        type: integer
   Run:
     type: object
     required: 
