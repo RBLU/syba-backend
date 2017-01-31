@@ -103,14 +103,19 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /batchconfigs/{itsBatchConfig}/kennzahlvalues:
+  /batchconfigs/{itsBatchConfig}/kennzahlvalues/{itsKennzahlConfig}:
     x-swagger-router-controller: kennzahlvalues
     get: 
       description: Returns all kennzahlValues for a batchconfig
       parameters: 
         - name: itsBatchConfig
           in: path
-          description: boid of batch to fetch
+          description: boid of batchconfig to fetch KennzahlValues for
+          required: true
+          type: string
+        - name: itsKennzahlConfig
+          in: path
+          description: boid of kennzahlConfig to fetch KennzahlValues for
           required: true
           type: string
       responses:

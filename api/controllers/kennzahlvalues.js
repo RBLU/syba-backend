@@ -18,7 +18,7 @@ var util = require('util'),
  we specify that in the exports of this module that 'hello' maps to the function named 'hello'
  */
 
-let filterClause = (req) => {
-    return 'ITSBATCHCONFIG = :itsBatchConfig';
+let filterClause = () => {
+    return 'ITSBATCHCONFIG = :itsBatchConfig AND ITSKENNZAHLCONFIG = :itsKennzahlConfig';
 };
 module.exports = require('../helpers/oracleRestHandler').getHandler('SYBA.KENNZAHLVALUE', 'syba', filterClause);
