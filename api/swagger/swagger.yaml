@@ -20,7 +20,7 @@ produces:
 paths:
   /swagger:
     x-swagger-pipe: swagger_raw
-  /batches:
+  /batchconfigs:
     x-swagger-router-controller: batches
     get: 
       description: Returns all known batches
@@ -37,21 +37,21 @@ paths:
             type: array
             items: 
               # a pointer to a definition
-              $ref: "#/definitions/Batch"
+              $ref: "#/definitions/Batchconfig"
         # responses may fall through to errors
         default:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
     post:
-      description: posts a new batch
+      description: posts a new batchconfig
       parameters: 
         - name: batch
           in: body
-          description: the batch to store
+          description: the batchconfig to store
           required: true
           schema: 
-            $ref: "#/definitions/Batch"
+            $ref: "#/definitions/Batchconfig"
       responses:
         "200":
           description: Success
@@ -60,11 +60,11 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"      
-  /batches/{id}:
+  /batchconfigs/{id}:
     x-swagger-router-controller: batches
     get:
-      description: Returns one batch by name
-      operationId: getById
+      description: Returns one Batchconfig by id
+      operationId: getBatchconfigById
       parameters:
         - name: id
           in: path
@@ -75,13 +75,60 @@ paths:
         "200":
           description: Success
           schema:
-            $ref: "#/definitions/Batch"
+            $ref: "#/definitions/Batchconfig"
         default:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /runs:
-    x-swagger-router-controller: batches
+    put: 
+      description: Updates a Batchconfig
+      parameters:
+        - name: id
+          in: path
+          description: boid of batch to fetch
+          required: true
+          type: string
+        - name: batchconfig
+          in: body
+          description: the payload data
+          required: true
+          schema: 
+            $ref: "#/definitions/Batchconfig"
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/Batchconfig"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /batchconfigs/{itsBatchConfig}/kennzahlvalues:
+    x-swagger-router-controller: kennzahlvalues
+    get: 
+      description: Returns all kennzahlValues for a batchconfig
+      parameters: 
+        - name: itsBatchConfig
+          in: path
+          description: boid of batch to fetch
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: array
+            items: 
+              # a pointer to a definition
+              $ref: "#/definitions/KennzahlValue"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
+  /batchruns:
+    x-swagger-router-controller: batchruns
     get: 
       description: Returns all known runs
       parameters: 
@@ -104,6 +151,49 @@ paths:
               # a pointer to a definition
               $ref: "#/definitions/Run"
         # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /batchruns/{id}:
+    x-swagger-router-controller: batchruns
+    get:
+      description: Returns one Batchrun by id
+      operationId: getBatchRunById
+      parameters:
+        - name: id
+          in: path
+          description: boid of batch to fetch
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/Run"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    put: 
+      description: Updates a Batchrun
+      parameters:
+        - name: id
+          in: path
+          description: boid of batch to fetch
+          required: true
+          type: string
+        - name: batchrun
+          in: body
+          description: the payload data
+          required: true
+          schema: 
+            $ref: "#/definitions/Run"
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/Batchconfig"
         default:
           description: Error
           schema:
@@ -134,7 +224,7 @@ definitions:
     properties:
       message:
         type: string
-  Batch:
+  Batchconfig:
     type: object
     required:
       - boid
@@ -144,11 +234,11 @@ definitions:
     properties:
       boid:
         type: string
+      itsSyriusBatch:
+        type: string
       name: 
         type: string
       description: 
-        type: string
-      itsSyriusBatch:
         type: string
       active:
         type: integer
@@ -159,12 +249,36 @@ definitions:
     properties: 
       boid:
         type: string
-      batch:
+      itsBatchconfig:
         type: string
-      starttime:
+      itsSyriusBatch:
+        type: string
+      itsSyriusBatchLauf:
+        type: string
+      started:
         type: string
         format: date-time
-      endtime: 
+      ended: 
+        type: string
+        format: date-time
+      comment:
+        type: string
+  KennzahlValue:
+    type: object
+    properties:
+      boid:
+        type: string
+      itsBatchRun:
+        type: string
+      itsKennzahlConfig:
+        type: string
+      itsBatchconfig:
+        type: string
+      itsSyriusBatch:
+        type: string
+      numbervalue:
+        type: string
+      timestampValue:
         type: string
         format: date-time
   User:

@@ -2,15 +2,21 @@ const oracledb = require('oracledb');
 const _ = require('lodash');
 const restify = require('restify');
 
-let getGenericHandler = function (tableName, poolname) {
+let getGenericHandler = function (tableName, poolname, filterClause) {
 
   return {
     get: function (req, res, next) {
       oracledb.getConnection(poolname)
         .then(function (conn) {
           let query = 'SELECT * FROM ' + tableName;
+          if (filterClause) {
+            query += ' WHERE ' + filterClause(req);
+          }
           console.log('Handler.get, executing query: ' + query);
-          conn.execute(query, [], {outFormat: oracledb.OBJECT})
+          console.log("swagger params: " + JSON.stringify(_.keys(req.swagger.params)));
+          let params = _.mapValues(req.swagger.params, (param) => {return param && param.raw || ''});
+          console.log("params: " + JSON.stringify(params));
+          conn.execute(query, filterClause ? params : [], {outFormat: oracledb.OBJECT})
             .then((result) => {
               conn.close();
               return next(null, result.rows);
