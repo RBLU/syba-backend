@@ -4,7 +4,6 @@ const restify = require('restify');
 
 let getGenericHandler = function (tableName, poolname) {
 
-
   return {
     get: function (req, res, next) {
       oracledb.getConnection(poolname)
@@ -83,7 +82,7 @@ let getGenericHandler = function (tableName, poolname) {
         });
     },
     delete: function (req, res, next) {
-      throw new Error("not implemented yet");
+      throw new Error("not implemented yet, call your system administrator...");
     },
     post: function (req, res, next) {
       oracledb.getConnection(poolname)
@@ -114,7 +113,6 @@ let getGenericHandler = function (tableName, poolname) {
         });
     }
   }
-
 };
 
 

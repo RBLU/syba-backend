@@ -4,6 +4,9 @@ const fs  = require('fs');
 
 const SYBA_schemadir = './SQL/SYBA/';
 
+// TODO: Read this from config file
+const currentSoftwareSchemaVersion = '1';
+
 let initialize = function () {
   let sybaPoolPromise = oracledb.createPool(
     {
@@ -35,19 +38,18 @@ let initialize = function () {
             if (err && _.startsWith(err.message, 'ORA-00942')) {
               console.log('Database: SYBA schema not present: ' + err.message);
               conn.close();
-              return createSybaSchema();
+              return updateSybaSchema(null, currentSoftwareSchemaVersion);
             } else if (err) {
               console.log('Database: Error connecting: ' + err.message);
               conn.close();
               throw err;
             }
-            if (result && result.rows[0] && result.rows[0][0] === '1') {
+            if (result && result.rows[0] && result.rows[0][0] === currentSoftwareSchemaVersion) {
               console.log('Database: SYBA schema already initialized, version: ' + result.rows[0][0])
               conn.close();
             } else {
               console.log('Database: SYBA schema not at correct version:' + result.rows[0][0]);
-              conn.close();
-              throw(new Error('Schema updating not implemented, call emergency help'))
+              return updateSybaSchema(result.rows[0][0], currentSoftwareSchemaVersion);
             }
           });
         }).catch(function(err) {
@@ -57,17 +59,21 @@ let initialize = function () {
     })
 };
 
-let createSybaSchema = function() {
+let updateSybaSchema = function(currentVersion, targetVersion) {
+  if (currentVersion) {
+    throw(new Error('Schema updating not implemented, call emergency help'));
+  }
   console.log("Database: creating SYBA Schema");
   var promises = [];
-  fs.readdir(SYBA_schemadir, (err, files) => {
+  const schemadir = SYBA_schemadir + '/v_' + targetVersion;
+  fs.readdir(schemadir, (err, files) => {
     if (err) {
       throw err;
     }
     console.log("Database: Found Schema Files: " + JSON.stringify(files));
-    files.forEach((filename) => {
+    files.sort().forEach((filename) => {
       console.log("Database: Processing: " + filename);
-      fs.readFile(SYBA_schemadir + filename, 'UTF-8', (err, content) => {
+      fs.readFile(schemadir +'/'+ filename, 'UTF-8', (err, content) => {
         if (err) {
           throw err;
         }
@@ -76,9 +82,15 @@ let createSybaSchema = function() {
           .then((conn) => {
             conn.execute(content)
               .then((result) => {
-                conn.close();
-                console.log("SUCCESS: " + filename + ': ' + JSON.stringify(result));
-                return result;
+                conn.commit()
+                  .then((err) => {
+                    if (err) {
+                      throw err;
+                    }
+                    conn.close();
+                    console.log("SUCCESS: " + filename + ': ' + JSON.stringify(result));
+                    return result;
+                  });
               })
               .catch((err) => {
                 conn.close();

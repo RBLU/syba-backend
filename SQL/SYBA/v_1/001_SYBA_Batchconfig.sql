@@ -5,6 +5,5 @@ BEGIN
   name varchar(100),
   description varchar(100),
   active number(1),
-  CONSTRAINT bc_boid unique(boid)  )';
-
+  CONSTRAINT bc_boid unique(boid))';
 END;

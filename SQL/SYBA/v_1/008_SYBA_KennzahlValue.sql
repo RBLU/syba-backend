@@ -4,7 +4,7 @@ BEGIN
   itsBatchRun VARCHAR (40),
   itsKennzahlConfig VARCHAR (40),
   itsBatchConfig VARCHAR (40),
-  itsBatch VARCHAR (40),
+  itsSyriusBatch VARCHAR (40),
   numberValue NUMBER (10, 2),
   timestampValue TIMESTAMP,
   CONSTRAINT kz_boid unique(boid)

@@ -35,3 +35,4 @@ config/runtime.yaml
 
 .DS_Store
 SQL/TABLE_Batchlauf.sql
+data/develop/TABLE_Batchlauf.sql

@@ -1,7 +1,8 @@
 CREATE Table SYBA.BATCHRUN (
   boid varchar(40),
   itsBatchconfig varchar(40),
-  itsBatch varchar(40),
+  itsSyriusBatch varchar(40),
+  itsSyriusBatchlauf varchar(40),
   started timestamp,
   ended timestamp
 )

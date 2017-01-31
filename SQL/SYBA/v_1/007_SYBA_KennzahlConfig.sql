@@ -1,7 +1,7 @@
 CREATE Table SYBA.KENNZAHLCONFIG (
   boid varchar(40),
   itsBatchConfig varchar(40),
-  itsBatch varchar(40),
+  itsSyriusBatch varchar(40),
   itsKennzahl varchar(40),
   name varchar(100),
   description varchar(100),
