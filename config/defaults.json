@@ -1,0 +1,83 @@
+{
+  "app": {
+    "name": "SYBA Backend Service"
+  },
+  "session_timeout": 1200000,
+  "socket_loglevel": "2",
+  "version": "0.1.0",
+  "host": "localhost",
+  "port": "8080",
+  "webclientUrl": "http://localhost:3000",
+  "backendUrl": "http://localhost:8080",
+  "db_prefix": "mongodb",
+  "db_host": "localhost",
+  "db_port": "27017",
+  "db_database": "test_database",
+  "linkTokenEncryption": {
+    "key": "50126a4a500219238cd678a383cdab197ed5fe42",
+    "algorithm": "aes256",
+    "maxTokenLifetime": 600000,
+    "separator": "|"
+  },
+  "nodemailer": {
+    "service": "Mailjet",
+    "auth": {
+      "user": "785bb8e4ce318859e0c786257d39f99e",
+      "pass": "3d60c4eca11f1e5112f94503805c0bcd"
+    }
+  },
+  "user": {
+    "emailVerificationUrl": "/#/email_verification/",
+    "passwordResetUrl": "/#/password_reset/"
+  },
+  "email": {
+    "enabled": "enabled",
+    "fromString": "REVOLUTION <dontreply@youpers.com>",
+    "templatesDir": "src/mailtemplates",
+    "tracking": {
+      "enabled": "disabled"
+    },
+    "emailConfirmation": "disabled"
+  },
+  "accessTokenSecret": "knfad*ç%&/(&/sdkjfnaklsdnfASDFAS2341",
+  "oauth": {
+    "github": {
+      "clientID": "ddfb0568a53ead210f61",
+      "clientSecret": "ee82f353b27509bb1cb9269b26b02b611e528fe6"
+    },
+    "facebook": {
+      "clientID": "1443351149277228",
+      "clientSecret": "d910fee6236a08c7606069f6bb72f626"
+    }
+  },
+  "log": {
+    "name": "Main",
+    "stdout": "debug"
+  },
+  "feedback": {
+    "username": "feedback",
+    "password": "lkmanv90e3ionm23k",
+    "url": "https://youpers.atlassian.net",
+    "project": "WL"
+  },
+  "push": {
+    "googlePushApiKey": "AIzaSyAdITOafksq7NJFjMFh57skSP4dNiEg8Hg",
+    "appleApnCert": "src/config/rev-apn-cert.pem",
+    "appleApnKey": "src/config/rev-apn-key.pem",
+    "appleApnIsProduction": "true"
+  },
+  "AWS": {
+    "defaultRegion": "eu-central-1",
+    "accessKeyId": "AKIAID5NWWQYCVJ6BDCQ",
+    "secretAccessKey": "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",
+    "fileupload": {
+      "bucketName": "rev-fileuploads-test"
+    }
+  },
+  "i18n": {
+    "fallbackLng": "de",
+    "supportedLngs": ["de", "en"],
+    "namespaces":["email", "general"]
+  }
+}
+

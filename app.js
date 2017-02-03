@@ -1,30 +1,165 @@
 'use strict';
 
-var SwaggerRestify = require('swagger-restify-mw');
+var Runner = require('swagger-node-runner');
 var restify = require('restify');
+var swaggerRestify = require('./api/helpers/swagger-restify');
 var db = require('./database');
+const _ = require('lodash');
+
+var config = require('./config/config');
+config.appRoot =  __dirname; // required config
+
+var logger = require('./api/helpers/log').getLogger(config);
+
+var server = restify.createServer({
+  name: config.app.name,
+  version: config.version,
+  log: logger
+});
+
+module.exports = server; // for testing
 
 
-var app = restify.createServer();
+// setup CORS
+var myCustomHeaders = ['X-Requested-With', 'Cookie', 'Set-Cookie', 'X-Api-Version', 'X-Request-Id', 'yp-language', 'location', 'authorization'];
+_.forEach(myCustomHeaders, function (header) {
+  restify.CORS.ALLOW_HEADERS.push(header);
+});
 
-module.exports = app; // for testing
+server.pre(restify.CORS({
+  credentials: true,                  // defaults to false
+  headers: myCustomHeaders
+}));
 
-var config = {
-  appRoot: __dirname // required config
-};
+
+// setting logging of request and response, uncaught errors
+server.pre(function (req, response, next) {
+  var path = (req.route && req.route.path) || req.url; // for req.method == OPTIONS the req.route is not available, so we log the url
+  var isPing = path.indexOf('ping/db') !== -1;
+
+  req.log[isPing ? 'trace' : 'debug']({
+    req_id: req.getId(),
+    req: req,
+    path: path,
+    method: req.method
+  }, 'start processing request');
+  return next();
+});
+
+
+server.on('uncaughtException', function (req, res, route, err) {
+  req.log.error({
+    err: err,
+    method: req.method,
+    url: req.url,
+    path: (req.route && req.route.path) || req.url,
+    message: err.message
+  }, "uncaught server exception in restify server");
+  console.error('Caught uncaught server Exception: ' + err);
+  if (!res.headersSent) {
+    res.send(new error.InternalError(err, err.message || 'unexpected error'));
+  }
+  return (true);
+});
+
+process.on('uncaughtException', function (err) {
+  logger.error({err: err, message: err.message}, "UNCAUGHT PROCESS ERROR: logging to error: " + err.message);
+  console.error(new Date().toString() + ": Exiting process because of Uncaught Error: " + err.message + ", err: " + err);
+  process.exit(1);
+});
+
+server.on('after', function (req, res, route, err) {
+  var path = (req.route && req.route.path) || req.url; // for req.method == OPTIONS the req.route is not available, so we log the url
+  var isPing = path.indexOf('ping/db') !== -1;
+  req.log[isPing ? 'trace' : 'info']({
+    method: req.method,
+    url: req.url,
+    statusCode: res.statusCode,
+    'x-real-ip': req.headers['x-real-ip'],
+    username: req.user && req.user.email,
+    responsetime: res.getHeader('Response-Time'),
+    path: path
+  }, "finished processing request");
+
+  if (err && !err.doNotLog) {
+    // treat some well known errors differently, no stack trace, no body
+    if (res.statusCode === 401 || res.statusCode === 403) {
+      req.log.info({
+        method: req.method,
+        url: req.url,
+        path: (req.route && req.route.path) || req.url,
+        statusCode: res.statusCode,
+        'x-real-ip': req.headers['x-real-ip'],
+        username: req.user && req.user.email,
+        error: err.message
+      }, res.statusCode + ": " + err.name || err.message);
+    } else {
+      req.log.error({
+        req: req,
+        err: err,
+        res: res,
+        method: req.method,
+        url: req.url,
+        path: (req.route && req.route.path) || req.url,
+        'x-real-ip': req.headers['x-real-ip'],
+        username: req.user && req.user.email,
+        statusCode: res.statusCode,
+        reqbody: req.body,
+        resbody: _.isFunction(res._body.toObject) ? res._body.toObject() : res._body
+      }, res.statusCode + ': ' + err.name + ': Error while handling request');
+    }
+  } else if (req.method === 'POST' || req.method === 'PUT') {
+    req.log.debug({
+      method: req.method,
+      url: req.url,
+      path: (req.route && req.route.path) || req.url,
+      statusCode: res.statusCode,
+      'x-real-ip': req.headers['x-real-ip'],
+      username: req.user && req.user.email,
+      reqbody: req.body
+    }, 'POST/PUT: request body');
+  }
+
+  if (req.log.trace() && res._body && _.keys(res._body).length > 0) {
+
+    req.log.trace({
+      resbody: res._body,
+      method: req.method,
+      url: req.url,
+      'x-real-ip': req.headers['x-real-ip'],
+      username: req.user && req.user.email,
+      path: (req.route && req.route.path) || req.url,
+      statusCode: res.statusCode
+    }, 'response body');
+  }
+});
+
+
+server.use(restify.requestLogger());
+server.use(restify.acceptParser(server.acceptable));
+server.use(restify.queryParser());
+server.use(restify.bodyParser({mapParams: false}));
+//server.use(passport.initialize());
+server.use(restify.fullResponse());
 
 db.init()
   .then(() => {
-    SwaggerRestify.create(config, function (err, swaggerRestify) {
+
+
+    Runner.create(config, function (err, runner) {
       if (err) {
         throw err;
       }
-      swaggerRestify.register(app);
+      //runner.restifyMiddleware().register(server);
 
+      swaggerRestify.register(server, runner);
 
-      var port = process.env.PORT || swaggerRestify.runner.swagger.host.split(':')[1] || 10010;
-      app.listen(port);
-      if (swaggerRestify.runner.swagger.paths['/batches']) {
+//      server.get('/api/batchconfigs/:itsBatchConfig/kennzahlvalues/:itsKennzahlConfig',
+//        require('./api/controllers/kennzahlvalues').get);
+
+      var port = process.env.PORT || runner.swagger.host.split(':')[1] || 10010;
+      server.listen(port);
+      if (runner.swagger.paths['/batchconfigs']) {
         console.log('try this:\ncurl http://127.0.0.1:' + port + '/api/batches');
       }
     })

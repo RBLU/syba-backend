@@ -8,9 +8,12 @@
   "license": "",
   "main": "app.js",
   "dependencies": {
+    "bunyan": "^1.8.5",
+    "bunyan-logstash-tcp": "^0.3.5",
+    "nconf": "^0.8.4",
     "oracledb": "^1.12.2",
     "restify": "^4.0.2",
-    "swagger-restify-mw": "^0.7.0"
+    "swagger-node-runner": "^0.7.1"
   },
   "devDependencies": {
     "should": "^11.2.0",

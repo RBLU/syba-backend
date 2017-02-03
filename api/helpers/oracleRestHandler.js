@@ -2,7 +2,7 @@ const oracledb = require('oracledb');
 const _ = require('lodash');
 const restify = require('restify');
 
-let getGenericHandler = function (tableName, poolname, filterClause) {
+let getGenericHandler = function (tableName, poolname, filterClause, orderClause) {
 
   return {
     get: function (req, res, next) {
@@ -12,28 +12,31 @@ let getGenericHandler = function (tableName, poolname, filterClause) {
           if (filterClause) {
             query += ' WHERE ' + filterClause(req);
           }
-          console.log('Handler.get, executing query: ' + query);
-          console.log("swagger params: " + JSON.stringify(_.keys(req.swagger.params)));
-          let params = _.mapValues(req.swagger.params, (param) => {return param && param.raw || ''});
-          console.log("params: " + JSON.stringify(params));
-          conn.execute(query, filterClause ? params : [], {outFormat: oracledb.OBJECT})
+
+          if (orderClause) {
+            query += ' ORDER BY ' + orderClause(req);
+          }
+          req.log.debug({query: query, parameter: req.params}, 'Handler.get, executing query');
+          conn.execute(query, filterClause ? req.params : [], {outFormat: oracledb.OBJECT})
             .then((result) => {
+              req.log.debug({rows: result.rows.length}, "query executed successfully");
               conn.close();
-              return next(null, result.rows);
+              res.send(result.rows);
+              return next(null);
             })
             .catch((err) => {
               conn.close();
-              console.log("Error: " + JSON.stringify(err));
+              req.log.error({err: err}, "Error executing qurey");
               return next(err);
             });
         })
         .catch(function (err) {
-          console.log("Error: " + JSON.stringify(err));
+          req.log.error({err: err}, "Error getting Db Connection");
           return next(err);
         });
     },
     getById: function (req, res, next) {
-      let id = req.swagger.params.id.raw;
+      let id = req.params.id.raw;
       oracledb.getConnection(poolname)
         .then(function (conn) {
           const query = 'SELECT * from ' + tableName + ' where boid=:boid';
@@ -47,7 +50,8 @@ let getGenericHandler = function (tableName, poolname, filterClause) {
               } else if (result.rows.length > 1){
                 return next(new restify.InternalServerError("got more than one object, not expected"));
               }
-              return next(null, result.rows[0]);
+              res.send(result.rows[0]);
+              return next();
             })
             .catch((err) => {
               conn.close();

@@ -7,6 +7,7 @@ BEGIN
   itsSyriusBatch VARCHAR (40),
   numberValue NUMBER (10, 2),
   timestampValue TIMESTAMP,
+  started TIMESTAMP,
   CONSTRAINT kz_boid unique(boid)
   )';
 

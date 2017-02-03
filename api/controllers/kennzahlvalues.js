@@ -21,4 +21,5 @@ var util = require('util'),
 let filterClause = () => {
     return 'ITSBATCHCONFIG = :itsBatchConfig AND ITSKENNZAHLCONFIG = :itsKennzahlConfig';
 };
-module.exports = require('../helpers/oracleRestHandler').getHandler('SYBA.KENNZAHLVALUE', 'syba', filterClause);
+module.exports = require('../helpers/oracleRestHandler')
+  .getHandler('SYBA.KENNZAHLVALUE', 'syba', filterClause, (req) => {return 'STARTED ASC';});
