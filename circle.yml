@@ -2,13 +2,17 @@ machine:
   node:
     version: 6.9.4
   environment:
-    OCI_HOME: /opt/oracle/instantclient
+    OCI_HOME: ~/.oracle
     OCI_LIB_DIR: $OCI_HOME
     OCI_INCLUDE_DIR: $OCI_HOME/sdk/include
 dependencies:
   pre:
     - mkdir -p ~/.oracle
-    - wget https://retohome.youpers.org/oracleclient/instantclient-basiclite-linux.x64-12.1.0.2.0.zip
-    - wget https://retohome.youpers.org/oracleclient/instantclient-sdk-linux.x64-12.1.0.2.0.zip
+    - wget https://retohome.youpers.org/oracleclient/instantclient-basiclite-linux.x64-12.1.0.2.0.zip -o ~/.oracle/oracl.zip
+    - wget https://retohome.youpers.org/oracleclient/instantclient-sdk-linux.x64-12.1.0.2.0.zip -o ~/.oracle/oraclsdk.zip
+    - unzip ~/.oracle/*.zip
+    - mv ~/.oracle/libocci.so.12.1 ~/.oracle/libocci.so
+    - mv ~/.oracle/libclntsh.so.12.1 ~/.oracle/libclntsh.so
+    - export LD_LIBRARY_PATH=~/.oracle:$LD_LIBRARY_PATH
   cache_directories:
     - "~/.oracle"
