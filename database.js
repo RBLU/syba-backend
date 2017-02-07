@@ -12,7 +12,8 @@ let initialize = function () {
     {
       user: 'syba',
       password: 'syba',
-      connectString: '10.1.1.46/orcl',
+      connectString: '10.1.1.47/XE',
+//      connectString: '192.168.1.100/orcl',
       poolAlias: 'syba'
     }
   );
@@ -21,7 +22,7 @@ let initialize = function () {
     {
       user: 'syriusadm',
       password: 'syriusadm',
-      connectString: '10.1.1.46/orcl',
+      connectString: '10.1.1.47/xe',
       poolAlias: 'syriusadm'
     }
   );

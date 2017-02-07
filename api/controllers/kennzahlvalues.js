@@ -21,5 +21,14 @@ var util = require('util'),
 let filterClause = () => {
     return 'ITSBATCHCONFIG = :itsBatchConfig AND ITSKENNZAHLCONFIG = :itsKennzahlConfig';
 };
-module.exports = require('../helpers/oracleRestHandler')
+
+let handler = require('../helpers/oracleRestHandler')
   .getHandler('SYBA.KENNZAHLVALUE', 'syba', filterClause, (req) => {return 'STARTED ASC';});
+
+handler.getKennzahlenForRun = function(req, res, next) {
+
+};
+
+module.exports = handler;
+
+

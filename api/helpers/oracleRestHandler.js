@@ -17,7 +17,7 @@ let getGenericHandler = function (tableName, poolname, filterClause, orderClause
             query += ' ORDER BY ' + orderClause(req);
           }
           req.log.debug({query: query, parameter: req.params}, 'Handler.get, executing query');
-          conn.execute(query, filterClause ? req.params : [], {outFormat: oracledb.OBJECT})
+          conn.execute(query, filterClause ? req.params : [], {outFormat: oracledb.OBJECT, maxRows: 500})
             .then((result) => {
               req.log.debug({rows: result.rows.length}, "query executed successfully");
               conn.close();

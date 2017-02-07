@@ -131,6 +131,35 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /batchconfigs/{itsBatchConfig}/run/{itsBatchRun}/kennzahlen:
+    x-swagger-router-controller: kennzahlvalues
+    get:
+      description: Returns all kennzahlValues for a batchconfig
+      operationId: getKennzahlenForRun
+      parameters:
+        - name: itsBatchConfig
+          in: path
+          description: boid of batchconfig to fetch KennzahlValues for
+          required: true
+          type: string
+        - name: itsBatchRun
+          in: path
+          description: boid of batchconfig to fetch KennzahlValues for
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: array
+            items:
+              # a pointer to a definition
+              $ref: "#/definitions/RunKennzahl"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
 
   /batchruns:
     x-swagger-router-controller: batchruns
@@ -286,6 +315,30 @@ definitions:
       timestampValue:
         type: string
         format: date-time
+  RunKennzahl:
+    type: object
+    properties:
+      ITSBATCHRUN:
+        type: string
+      ITSKENNZAHLCONFIG:
+        type: string
+      ITSBATCHCONFIG:
+        type: string
+      ITSKENNZAHL:
+        type: string
+      NAME:
+        type: string
+      VALUE:
+        type: string
+      AVG:
+        type: string
+      STDDEV:
+        type: string
+      MIN:
+        type: string
+      MAX:
+        type: string
+
   User:
     type: object
     required: 
