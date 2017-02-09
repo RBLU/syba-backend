@@ -2,7 +2,7 @@ machine:
   node:
     version: 6.9.4
   environment:
-    OCI_HOME: ~/.oracle/instantclient
+    OCI_HOME: /home/ubuntu/.oracle/instantclient
     OCI_LIB_DIR: $OCI_HOME
     OCI_INCLUDE_DIR: $OCI_HOME/sdk/include
     LD_LIBRARY_PATH: /.oracle/instantclient/$LD_LIBRARY_PATH
