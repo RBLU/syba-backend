@@ -4,6 +4,7 @@ machine:
   environment:
     OCI_HOME: /home/ubuntu/.oracle/instantclient
     OCI_LIB_DIR: $OCI_HOME
+    OCI_INC_DIR: $OCI_HOME/sdk/include
     OCI_INCLUDE_DIR: $OCI_HOME/sdk/include
     LD_LIBRARY_PATH: /.oracle/instantclient/$LD_LIBRARY_PATH
 dependencies:
