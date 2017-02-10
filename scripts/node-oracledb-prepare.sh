@@ -4,7 +4,7 @@ set -e
 TEST_CACHE_FILE=/home/ubuntu/.oracle/instantclient/libclntsh.so
 
 if [ -f  TEST_CACHE_FILE ]; then
-    echo oracle instant client: using cahched version
+    echo oracle instant client: using cached version
 else
     mkdir -p ~/.oracle
     cd ~/.oracle

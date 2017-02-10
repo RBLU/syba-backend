@@ -10,5 +10,6 @@ machine:
 dependencies:
   pre:
     - scripts/node-oracledb-prepare.sh
+    - npm install -g mocha
   cache_directories:
     - "~/.oracle"
