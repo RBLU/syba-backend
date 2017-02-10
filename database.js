@@ -22,7 +22,7 @@ let initialize = function () {
     {
       user: 'syriusadm',
       password: 'syriusadm',
-      connectString: '10.1.1.47/xe',
+      connectString: 'retohome.youpers.org/xe',
       poolAlias: 'syriusadm'
     }
   );
