@@ -1,30 +1,38 @@
 var should = require('should');
 var request = require('supertest');
-var server = require('../../../app');
+var server;
 
-describe('controllers', function() {
+before(function(done) {
+  require('../../../app')(function (serv) {
+    server = serv;
+    return done();
+  });
 
-  describe('batchconfig', function() {
+});
 
-    describe('GET /batchconfigs', function() {
+describe('controllers', function () {
 
-      it('should return an error as we dont have a db', function(done) {
+  describe('batchconfig', function () {
 
-        request(server)
-          .get('/api/batchconfigs')
-          .set('Accept', 'application/json')
-          .expect('Content-Type', /json/)
-          .expect(500)
-          .end(function(err, res) {
+    describe('GET /batchconfigs', function () {
 
-            done();
-          });
+        it('should return an error as we dont have a db', function (done) {
+
+            request(server)
+              .get('/api/batchconfigs')
+              .set('Accept', 'application/json')
+              .expect('Content-Type', /json/)
+              .expect(200)
+              .end(function (err, res) {
+
+                return done(err);
+              });
+
+
+        });
+
       });
-
-
 
     });
 
   });
-
-});

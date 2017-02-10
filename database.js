@@ -12,8 +12,8 @@ let initialize = function () {
     {
       user: 'syba',
       password: 'syba',
-      connectString: '10.1.1.47/XE',
-//      connectString: '192.168.1.100/orcl',
+//      connectString: '10.1.1.183/XE',
+      connectString: 'retohome.youpers.org/XE',
       poolAlias: 'syba'
     }
   );

@@ -17,7 +17,12 @@ var server = restify.createServer({
   log: logger
 });
 
-module.exports = server; // for testing
+var testReadyCb
+
+module.exports = function (cb) {
+  testReadyCb = cb;
+  return server;
+}; // for testing
 
 
 // setup CORS
@@ -149,11 +154,15 @@ Runner.create(config, function (err, runner) {
   }
 
   swaggerRestify.register(server, runner);
+  var port = process.env.PORT || runner.swagger.host.split(':')[1] || 10010;
+  server.listen(port);
+
   console.log("our runner is here");
   db.init()
     .then(() => {
-      var port = process.env.PORT || runner.swagger.host.split(':')[1] || 10010;
-      server.listen(port);
+      if (testReadyCb) {
+        return testReadyCb(server);
+      }
     })
     .catch((err) => {
       console.log(err);
