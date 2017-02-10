@@ -8,6 +8,7 @@ export LD_LIBRARY_PATH=$OCI_HOME:$LD_LIBRARY_PATH
 
 cd /home/syba
 pm2 delete all
+pm2 kill
 rm -rf syba-backend
 mkdir syba-backend
 mv deploy.tar.gz syba-backend
