@@ -1,0 +1,14 @@
+apps:
+  - script: ./app.js
+    name: 'api'
+    instances: 1
+    exec_mode: cluster
+    env:
+      NODE_ENV: development
+      OCI_HOME: /home/syba/oracleclient/instantclient
+      OCI_LIB_DIR: /home/syba/oracleclient/instantclient
+      OCI_INC_DIR: /home/syba/oracleclient/instantclient/sdk/include
+      OCI_INCLUDE_DIR: /home/syba/oracleclient/instantclient/sdk/include
+      LD_LIBRARY_PATH: /home/syba/oracleclient/instantclient
+    env_production:
+      NODE_ENV: production

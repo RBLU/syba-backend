@@ -14,4 +14,4 @@ mv deploy.tar.gz syba-backend
 cd syba-backend
 tar xzf deploy.tar.gz
 npm install
-pm2 start app.js
+pm2 start process.yml
