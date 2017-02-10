@@ -2,7 +2,7 @@
 set -e
 
 
-if [ -h  ~/.oracle/instantclient/libclntsh.so ]; then
+if [ -f  ~/.oracle/instantclient/libclntsh.so ]; then
     echo oracle instant client: using cached version
 else
     mkdir -p ~/.oracle
