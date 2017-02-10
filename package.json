@@ -21,6 +21,6 @@
   },
   "scripts": {
     "start": "node app.js",
-    "test": "swagger project test"
+    "test": "mocha test"
   }
 }
