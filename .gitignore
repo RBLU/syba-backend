@@ -35,3 +35,4 @@ config/runtime.yaml
 
 .DS_Store
 data/syriusadm/TABLE_Batchlauf.sql
+/dist/deploy.tar.gz

@@ -13,3 +13,9 @@ dependencies:
     - npm install -g mocha
   cache_directories:
     - "~/.oracle"
+deployment:
+  ci:
+    branch: master
+    commands:
+      - scripts/make-package.sh
+      - scripts/deploy.sh
