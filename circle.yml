@@ -6,7 +6,7 @@ machine:
     OCI_LIB_DIR: $OCI_HOME
     OCI_INC_DIR: $OCI_HOME/sdk/include
     OCI_INCLUDE_DIR: $OCI_HOME/sdk/include
-    LD_LIBRARY_PATH: /.oracle/instantclient/$LD_LIBRARY_PATH
+    LD_LIBRARY_PATH: $OCI_HOME:$LD_LIBRARY_PATH
 dependencies:
   pre:
     - scripts/node-oracledb-prepare.sh
