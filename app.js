@@ -7,7 +7,7 @@ var db = require('./database');
 const _ = require('lodash');
 
 var config = require('./config/config');
-config.appRoot =  __dirname; // required config
+config.appRoot = __dirname; // required config
 
 var logger = require('./api/helpers/log').getLogger(config);
 
@@ -142,30 +142,23 @@ server.use(restify.bodyParser({mapParams: false}));
 //server.use(passport.initialize());
 server.use(restify.fullResponse());
 
-db.init()
-  .then(() => {
 
+Runner.create(config, function (err, runner) {
+  if (err) {
+    throw err;
+  }
 
-    Runner.create(config, function (err, runner) {
-      if (err) {
-        throw err;
-      }
-      //runner.restifyMiddleware().register(server);
-
-      swaggerRestify.register(server, runner);
-
-//      server.get('/api/batchconfigs/:itsBatchConfig/kennzahlvalues/:itsKennzahlConfig',
-//        require('./api/controllers/kennzahlvalues').get);
-
+  swaggerRestify.register(server, runner);
+  console.log("our runner is here");
+  db.init()
+    .then(() => {
       var port = process.env.PORT || runner.swagger.host.split(':')[1] || 10010;
       server.listen(port);
-      if (runner.swagger.paths['/batchconfigs']) {
-        console.log('try this:\ncurl http://127.0.0.1:' + port + '/api/batches');
-      }
     })
+    .catch((err) => {
+      console.log(err);
+      throw err;
+    });
 
-  }).catch((err) => {
-  console.log(err);
-  throw err;
 });
 
