@@ -17,4 +17,4 @@ var util = require('util'),
  In the starter/skeleton project the 'get' operation on the '/hello' path has an operationId named 'hello'.  Here,
  we specify that in the exports of this module that 'hello' maps to the function named 'hello'
  */
-module.exports = require('../helpers/oracleRestHandler').getHandler('SYBA.BATCHCONFIG', 'syba');
+module.exports = require('../helpers/oracleRestHandler').getHandler('SYBA.BATCHRUN', 'syba');

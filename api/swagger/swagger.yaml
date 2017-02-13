@@ -3,7 +3,7 @@ info:
   version: "0.0.1"
   title: Syba-Backend
 # during dev, should point to your local machine
-host: localhost:6000
+host: localhost:7000
 # basePath prefixes all resource paths 
 basePath: /api
 # 
@@ -171,7 +171,7 @@ paths:
           description: Where clause to get only certain batches
           required: false
           type: string
-        - name: batch
+        - name: ITSBATCHCONFIG
           in: query
           description: the boid of the batch to return the runs for
           required: true

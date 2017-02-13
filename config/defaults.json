@@ -9,10 +9,12 @@
   "port": "8080",
   "webclientUrl": "http://localhost:3000",
   "backendUrl": "http://localhost:8080",
-  "db_prefix": "mongodb",
-  "db_host": "localhost",
-  "db_port": "27017",
-  "db_database": "test_database",
+  "db": {
+    "user": "syba",
+    "password": "syba",
+    "connectString": "10.1.1.183/XE",
+    "poolAlias": "syba"
+  },
   "linkTokenEncryption": {
     "key": "50126a4a500219238cd678a383cdab197ed5fe42",
     "algorithm": "aes256",
