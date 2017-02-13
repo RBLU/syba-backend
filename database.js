@@ -1,6 +1,7 @@
 const oracledb = require('oracledb');
 const _ = require('lodash');
 const fs  = require('fs');
+const config = require('./config/config');
 
 const SYBA_schemadir = './SQL/SYBA/';
 
@@ -10,19 +11,19 @@ const currentSoftwareSchemaVersion = '1';
 let initialize = function () {
   let sybaPoolPromise = oracledb.createPool(
     {
-      user: 'syba',
-      password: 'syba',
-//      connectString: '10.1.1.183/XE',
-      connectString: 'retohome.youpers.org/XE',
-      poolAlias: 'syba'
+      user: config.db.user,
+      password: config.db.password,
+      connectString: config.db.connectString,
+//      connectString: 'retohome.youpers.org/XE',
+      poolAlias: config.db.poolAlias
     }
   );
 
   let sysadmPoolPromise = oracledb.createPool(
     {
-      user: 'syriusadm',
-      password: 'syriusadm',
-      connectString: 'retohome.youpers.org/xe',
+      user: config.db.user,
+      password: config.db.password,
+      connectString: config.db.connectString,
       poolAlias: 'syriusadm'
     }
   );
