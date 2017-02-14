@@ -60,9 +60,9 @@ server.on('uncaughtException', function (req, res, route, err) {
     path: (req.route && req.route.path) || req.url,
     message: err.message
   }, "uncaught server exception in restify server");
-  console.error('Caught uncaught server Exception: ' + err);
+  console.log('Caught uncaught server Exception: ' + err);
   if (!res.headersSent) {
-    res.send(new error.InternalError(err, err.message || 'unexpected error'));
+    res.send(new restify.InternalError(err, err.message || 'unexpected error'));
   }
   return (true);
 });

@@ -35,6 +35,9 @@ module.exports = {
 
               let functionName = pathConfig[operationName].operationId || operationName;
               if (!operationName.startsWith('x-')) {
+                if (!_.isFunction(controller[functionName])) {
+                  throw new Error("Controller Function not found: " + functionName + " in: " + controllerName);
+                }
                 server.log.info({
                   path: path,
                   operation: operationName,
