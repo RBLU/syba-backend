@@ -64,7 +64,7 @@ paths:
     x-swagger-router-controller: batches
     get:
       description: Returns one Batchconfig by id
-      operationId: getBatchconfigById
+      operationId: getById
       parameters:
         - name: id
           in: path
@@ -189,13 +189,13 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /batchruns/{id}:
+  /batchruns/{BOID}:
     x-swagger-router-controller: batchruns
     get:
       description: Returns one Batchrun by id
-      operationId: getBatchRunById
+      operationId: getById
       parameters:
-        - name: id
+        - name: BOID
           in: path
           description: boid of batch to fetch
           required: true
@@ -212,7 +212,7 @@ paths:
     put: 
       description: Updates a Batchrun
       parameters:
-        - name: id
+        - name: BOID
           in: path
           description: boid of batch to fetch
           required: true

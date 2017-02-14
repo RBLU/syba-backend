@@ -32,13 +32,15 @@ module.exports = {
             controller = require(controllerName);
 
             _.each(pathConfig, (operationConfig, operationName) => {
+
+              let functionName = pathConfig[operationName].operationId || operationName;
               if (!operationName.startsWith('x-')) {
                 server.log.info({
                   path: path,
                   operation: operationName,
                   controller: controllerName
                 }, "registering route");
-                server[operationName](path, controller[operationName]);
+                server[operationName](path, controller[functionName]);
               }
             });
           } catch (err) {
