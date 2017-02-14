@@ -39,7 +39,19 @@ handler.getKennzahlWithHistory = function(req, res, next) {
       };
       req.log.debug({query: query, params: qparams}, 'Handler.getKennzahlWithHistory, executing query.');
 
-      let historyQuery = 'SELECT * from SYBA.KENNZAHLVALUE where ITSKENNZAHLCONFIG = :ITSKENNZAHLCONFIG order by STARTED ASC';
+      let includeIgnored = req.params.ignored;
+
+      let historyQuery = 'SELECT v.* from SYBA.KENNZAHLVALUE v';
+
+      if (!includeIgnored) {
+        historyQuery += ' INNER JOIN syba.batchrun br on v.itsBatchRun = br.boid' +
+          ' where v.ITSKENNZAHLCONFIG = :ITSKENNZAHLCONFIG AND nvl(br.ignoreInStats, \'0\') <> 1 ';
+      } else {
+        historyQuery +=
+          ' where v.ITSKENNZAHLCONFIG = :ITSKENNZAHLCONFIG';
+      }
+      historyQuery +=
+        ' order by v.STARTED ASC';
       req.log.debug({query: historyQuery, params: qparams}, 'Handler.getById, executing query.');
 
       Promise.all(

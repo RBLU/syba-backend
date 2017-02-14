@@ -28,15 +28,27 @@ handler.getById = function (req, res, next) {
       const query = 'SELECT * from SYBA.BATCHCONFIG where BOID=:BOID';
       req.log.debug({query: query, params: req.params}, 'Handler.getById, executing query.');
 
+      let includeIgnored = req.params.ignored;
+
       let statsQuery = 'SELECT k.name, k.description, v.itsKennzahlConfig,' +
-          ' v.ITSBATCHCONFIG, min(v.numberValue) as min, max(v.numberValue) as max,' +
-          ' avg(v.numberValue) as avg, stddev(v.numberValue) as stddev, median(v.numberValue) as median, count(1) as anzahl, ' +
-          ' k.levelMin, k.levelLowError, k.levelLowWarning, k.levelNormal, k.levelHighWarning, k.levelMax' +
-          ' from SYBA.kennzahlvalue v' +
-          ' inner join syba.kennzahlconfig k on v.itsKennzahlConfig = k.boid' +
-          ' where v.ITSBATCHCONFIG = :BOID ' +
-          ' group by v.itsKennzahlConfig,  k.description, k.name, v.ITSBATCHCONFIG, k.levelMin, k.levelLowError, k.levelLowWarning, k.levelNormal, k.levelHighWarning, k.levelMax'
-        ;
+        ' v.ITSBATCHCONFIG, min(v.numberValue) as min, max(v.numberValue) as max,' +
+        ' avg(v.numberValue) as avg, stddev(v.numberValue) as stddev, median(v.numberValue) as median, count(1) as anzahl, ' +
+        ' k.levelMin, k.levelLowError, k.levelLowWarning, k.levelNormal, k.levelHighWarning, k.levelMax' +
+        ' from SYBA.kennzahlvalue v' +
+        ' INNER JOIN syba.kennzahlconfig k on v.itsKennzahlConfig = k.boid';
+
+      req.log.debug({params: req.params, includeIgnored: includeIgnored}, "ignored?");
+
+      if (!includeIgnored) {
+
+        statsQuery += ' INNER JOIN syba.batchrun br on v.itsBatchRun = br.boid' +
+          ' where v.ITSBATCHCONFIG = :BOID AND nvl(br.ignoreInStats, \'0\') <> 1 ';
+      } else {
+       statsQuery +=
+            ' where v.ITSBATCHCONFIG = :BOID';
+      }
+      statsQuery += ' group by v.itsKennzahlConfig,  k.description, k.name, v.ITSBATCHCONFIG, k.levelMin, k.levelLowError, k.levelLowWarning, k.levelNormal, k.levelHighWarning, k.levelMax'
+
       req.log.debug({query: statsQuery, params: req.params}, 'Handler.getById, executing query.');
 
       Promise.all(

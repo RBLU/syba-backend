@@ -76,10 +76,16 @@ let getGenericHandler = function (tableName, poolname, filterClause, orderClause
           req.log.debug({query: query, params: req.params}, 'Executing Update Query: ' + updateClause);
           conn.execute(query,req.params,{outFormat: oracledb.OBJECT})
             .then((result) => {
-              req.log.debug({result: result}, 'Successfully Updated: ');
-              conn.close();
-              res.send(200, result);
-              return next();
+              conn.commit()
+                .then(() => {
+                  req.log.debug({result: result}, 'Successfully Updated: ');
+                  conn.close();
+                  res.send(200, result);
+                  return next();
+                });
+            })
+            .then((result) => {
+              return conn.commit();
             })
             .catch((err) => {
               conn.close();
