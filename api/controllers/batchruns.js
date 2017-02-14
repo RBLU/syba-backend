@@ -1,8 +1,10 @@
 'use strict';
 
-var util = require('util'),
+const util = require('util'),
   _ = require('lodash'),
-  oracledb = require('oracledb');
+  oracledb = require('oracledb'),
+  restify = require('restify');
+;
 
 
 /*
@@ -34,21 +36,18 @@ handler.getById = function(req, res, next) {
           req.log.debug({rows: result.rows.length}, "query executed successfully");
           let run = result.rows[0];
 
-          let statsQuery = 'SELECT k.name, k.description, v.itsKennzahlConfig,' +
-            ' v.ITSBATCHCONFIG, min(v.numberValue) as min, max(v.numberValue) as max,' +
-            ' avg(v.numberValue) as avg, stddev(v.numberValue) as stddev, median(v.numberValue) as median, count(1) as anzahl, ' +
-            ' k.levelMin, k.levelLowError, k.levelLowWarning, k.levelNormal, k.levelHighWarning, k.levelMax' +
+          let statsQuery = 'SELECT v.itsKennzahlConfig, v.ITSBATCHRUN, ' +
+            ' v.ITSBATCHCONFIG, v.NUMBERVALUE '+
             ' from SYBA.kennzahlvalue v' +
-            ' inner join syba.kennzahlconfig k on v.itsKennzahlConfig = k.boid' +
-            ' where v.ITSBATCHCONFIG = :ITSBATCHCONFIG ' +
-            ' group by v.itsKennzahlConfig,  k.description, k.name, v.ITSBATCHCONFIG, k.levelMin, k.levelLowError, k.levelLowWarning, k.levelNormal, k.levelHighWarning, k.levelMax'
+            ' where v.ITSBATCHCONFIG = :ITSBATCHCONFIG AND v.ITSBATCHRUN = :ITSBATCHRUN '
           ;
 
-          let params =
-          req.log.debug({query: statsQuery, parameter: {ITSBATCHCONFIG: run.ITSBATCHCONFIG}},
+          let params ={ITSBATCHCONFIG: run.ITSBATCHCONFIG, ITSBATCHRUN: req.params.BOID};
+
+          req.log.debug({query: statsQuery, parameter: params},
             'Handler:batchruns.getById, executing query for kzStats');
 
-          conn.execute(statsQuery, {ITSBATCHCONFIG: run.ITSBATCHCONFIG}, {outFormat: oracledb.OBJECT})
+          conn.execute(statsQuery, params, {outFormat: oracledb.OBJECT})
             .then((result) => {
               if (result.rows.length == 0) {
                 return next(new restify.ResourceNotFoundError());

@@ -60,13 +60,13 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"      
-  /batchconfigs/{id}:
+  /batchconfigs/{BOID}:
     x-swagger-router-controller: batches
     get:
-      description: Returns one Batchconfig by id
+      description: Returns one Batchconfig by id including the statistical Kennzahl information
       operationId: getById
       parameters:
-        - name: id
+        - name: BOID
           in: path
           description: boid of batch to fetch
           required: true
@@ -83,7 +83,7 @@ paths:
     put: 
       description: Updates a Batchconfig
       parameters:
-        - name: id
+        - name: BOID
           in: path
           description: boid of batch to fetch
           required: true

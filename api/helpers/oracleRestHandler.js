@@ -36,17 +36,16 @@ let getGenericHandler = function (tableName, poolname, filterClause, orderClause
         });
     },
     getById: function (req, res, next) {
-      let id = req.params.id.raw;
       oracledb.getConnection(poolname)
         .then(function (conn) {
-          const query = 'SELECT * from ' + tableName + ' where boid=:boid';
+          const query = 'SELECT * from ' + tableName + ' where BOID=:BOID';
           console.log('Handler.getById, executing query: ' + query);
-          conn.execute(query,[id],{outFormat: oracledb.OBJECT})
+          conn.execute(query,req.params,{outFormat: oracledb.OBJECT})
             .then((result) => {
               console.log("getById Result: " + JSON.stringify(result));
               conn.close();
               if (result.rows.length == 0) {
-                return next(new restify.NotFoundError("Object not found with id: " + id));
+                return next(new restify.NotFoundError("Object not found with BOID: " + req.params.BOID));
               } else if (result.rows.length > 1){
                 return next(new restify.InternalServerError("got more than one object, not expected"));
               }
