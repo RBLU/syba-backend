@@ -36,6 +36,12 @@ server.pre(restify.CORS({
   headers: myCustomHeaders
 }));
 
+server.opts( /.*/, ( req, res ) => {
+  res.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', restify.CORS.ALLOW_HEADERS.join(','));
+  res.send( 200 )
+} );
+
 
 // setting logging of request and response, uncaught errors
 server.pre(function (req, response, next) {
@@ -51,10 +57,6 @@ server.pre(function (req, response, next) {
   return next();
 });
 
-server.opts( /.*/, ( req, res ) => {
-  res.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
-  res.send( 200 )
-} );
 
 server.on('uncaughtException', function (req, res, route, err) {
   req.log.error({

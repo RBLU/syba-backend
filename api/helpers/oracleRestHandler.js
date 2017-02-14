@@ -95,23 +95,47 @@ let getGenericHandler = function (tableName, poolname, filterClause, orderClause
         });
     },
     delete: function (req, res, next) {
-      throw new Error("not implemented yet, call your system administrator...");
+      oracledb.getConnection(poolname)
+        .then(function (conn) {
+          let query = 'DELETE FROM ' + tableName + " WHERE BOID= :BOID";
+          req.log.debug({query: query, params: req.params}, 'Handler.DELETE, executing query');
+          conn.execute(query,req.params,{outFormat: oracledb.OBJECT})
+            .then((result) => {
+              req.log.debug({result: result}, "DELETE, successfully executed");
+              conn.commit(function(err) {
+                if (err) {
+                  conn.close();
+                  return next(err);
+                }
+                res.send(result);
+                conn.close();
+                return next();
+              });
+            })
+            .catch((err) => {
+              conn.close();
+              return next(err);
+            });
+
+
+
+        });
     },
     post: function (req, res, next) {
       oracledb.getConnection(poolname)
         .then(function (conn) {
 
           req.body.BOID = uuid.v4();
-          const query = "INSERT INTO " + tableName + "("
+          let query = "INSERT INTO " + tableName + "("
             + _.keys(req.body).join(",") +") VALUES ("+
             _(req.body).keys().reduce(function(result, value) {
               return result == '' ? result + ':' + value : result + ',:' + value
             }, '')
             + ")";
-          console.log('Handler.getById, executing query: ' + query);
+          req.log.debug({query: query, params: req.body}, 'Handler.POST, executing query');
           conn.execute(query,req.body,{outFormat: oracledb.OBJECT})
             .then((result) => {
-              console.log("getById Result: " + JSON.stringify(result));
+              req.log.debug({result: result}, "POST, successfully executed");
               conn.commit(function(err) {
                 if (err) {
                   conn.close();
