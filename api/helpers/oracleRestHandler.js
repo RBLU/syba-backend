@@ -65,21 +65,21 @@ let getGenericHandler = function (tableName, poolname, filterClause, orderClause
       oracledb.getConnection(poolname)
         .then(function (conn) {
 
-          let updateClause = _.reduce(data, function(result, value, key) {
+          let updateClause = _.reduce(req.body, function(result, value, key) {
             return result + ' ' + key + '='+value +','
           }, '');
 
           if (_.endsWith(updateClause, ',')) {
-            updateClause  = udpateClause.substr(0, updateClause.length -1);
+            updateClause  = updateClause.substr(0, updateClause.length -1);
           }
-
-          console.log('Update Clase: ' + updateClause);
-          conn.execute('UPDATE ' + tableName + ' SET ' +
-              updateClause
-            + ' WHERE boid=:boid',[id],{outFormat: oracledb.OBJECT})
+          let query = 'UPDATE ' + tableName + ' SET ' + updateClause + ' WHERE boid= :BOID'
+          req.log.debug({query: query, params: req.params}, 'Executing Update Query: ' + updateClause);
+          conn.execute(query,req.params,{outFormat: oracledb.OBJECT})
             .then((result) => {
+              req.log.debug({result: result}, 'Successfully Updated: ');
               conn.close();
-              return next(null, result.rows);
+              res.send(200, result);
+              return next();
             })
             .catch((err) => {
               conn.close();
