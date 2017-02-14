@@ -103,6 +103,23 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+    delete:
+      description: Removes a Batchconfig and all its associated data
+      parameters:
+        - name: BOID
+          in: path
+          description: boid of batch to fetch
+          required: true
+          type: string
+      responses:
+              "200":
+                description: Success
+                schema:
+                  $ref: "#/definitions/Batchconfig"
+              default:
+                description: Error
+                schema:
+                  $ref: "#/definitions/ErrorResponse"
   /batchconfigs/{ITSBATCHCONFIG}/kennzahlvalues/{ITSKENNZAHLCONFIG}:
     x-swagger-router-controller: kennzahlvalues
     get: 
@@ -233,6 +250,30 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /syriusbatches:
+    x-swagger-router-controller: syriusbatches
+    get:
+      description: Returns all known SyriusBatches
+      parameters:
+        - name: filter
+          in: query
+          description: Where clause to get only certain batches
+          required: false
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: array
+            items:
+              # a pointer to a definition
+              $ref: "#/definitions/SyriusBatch"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
   /users:
     x-swagger-router-controller: batches
     get: 
@@ -274,6 +315,24 @@ definitions:
       name: 
         type: string
       description: 
+        type: string
+      active:
+        type: integer
+  SyriusBatch:
+    type: object
+    required:
+      - boid
+      - name
+      - description
+      - itsSyriusBatch
+    properties:
+      boid:
+        type: string
+      itsSyriusBatch:
+        type: string
+      name:
+        type: string
+      description:
         type: string
       active:
         type: integer

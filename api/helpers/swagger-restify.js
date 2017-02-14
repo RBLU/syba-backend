@@ -35,15 +35,24 @@ module.exports = {
 
               let functionName = pathConfig[operationName].operationId || operationName;
               if (!operationName.startsWith('x-')) {
+
                 if (!_.isFunction(controller[functionName])) {
-                  throw new Error("Controller Function not found: " + functionName + " in: " + controllerName);
+                  server.log.error({
+                    controllerName: controllerName,
+                    functionName: functionName,
+                    operationName: operationName,
+                    path: path
+                  }, '"Controller Function not found: " + functionName + " in: " + controllerName, skipping this route');
+                } else {
+                  operationName = operationName == 'delete' ? 'del':operationName;
+                  server.log.info({
+                    path: path,
+                    operation: operationName,
+                    controller: controllerName,
+                    functionName: functionName
+                  }, "registering route");
+                  server[operationName](path, controller[functionName]);
                 }
-                server.log.info({
-                  path: path,
-                  operation: operationName,
-                  controller: controllerName
-                }, "registering route");
-                server[operationName](path, controller[functionName]);
               }
             });
           } catch (err) {

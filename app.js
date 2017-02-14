@@ -51,6 +51,10 @@ server.pre(function (req, response, next) {
   return next();
 });
 
+server.opts( /.*/, ( req, res ) => {
+  res.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+  res.send( 200 )
+} );
 
 server.on('uncaughtException', function (req, res, route, err) {
   req.log.error({

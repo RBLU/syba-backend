@@ -1,6 +1,7 @@
 const oracledb = require('oracledb');
 const _ = require('lodash');
 const restify = require('restify');
+const uuid = require('node-uuid');
 
 let getGenericHandler = function (tableName, poolname, filterClause, orderClause) {
 
@@ -17,7 +18,7 @@ let getGenericHandler = function (tableName, poolname, filterClause, orderClause
             query += ' ORDER BY ' + orderClause(req);
           }
           req.log.debug({query: query, parameter: req.params}, 'Handler.get, executing query');
-          conn.execute(query, filterClause ? req.params : [], {outFormat: oracledb.OBJECT})
+          conn.execute(query, filterClause ? req.params : [], {outFormat: oracledb.OBJECT, maxRows: 500})
             .then((result) => {
               req.log.debug({rows: result.rows.length}, "query executed successfully");
               conn.close();
@@ -99,6 +100,8 @@ let getGenericHandler = function (tableName, poolname, filterClause, orderClause
     post: function (req, res, next) {
       oracledb.getConnection(poolname)
         .then(function (conn) {
+
+          req.body.BOID = uuid.v4();
           const query = "INSERT INTO " + tableName + "("
             + _.keys(req.body).join(",") +") VALUES ("+
             _(req.body).keys().reduce(function(result, value) {
@@ -110,9 +113,13 @@ let getGenericHandler = function (tableName, poolname, filterClause, orderClause
             .then((result) => {
               console.log("getById Result: " + JSON.stringify(result));
               conn.commit(function(err) {
-                if (err) {return next(err);}
+                if (err) {
+                  conn.close();
+                  return next(err);
+                }
+                res.send(req.body);
                 conn.close();
-                return next(null, result);
+                return next();
               });
             })
             .catch((err) => {
