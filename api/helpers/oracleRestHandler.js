@@ -84,9 +84,6 @@ let getGenericHandler = function (tableName, poolname, filterClause, orderClause
                   return next();
                 });
             })
-            .then((result) => {
-              return conn.commit();
-            })
             .catch((err) => {
               conn.close();
               return next(err);

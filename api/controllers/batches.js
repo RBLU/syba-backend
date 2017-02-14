@@ -26,9 +26,11 @@ handler.getById = function (req, res, next) {
   oracledb.getConnection('syba')
     .then(function (conn) {
       const query = 'SELECT * from SYBA.BATCHCONFIG where BOID=:BOID';
-      req.log.debug({query: query, params: req.params}, 'Handler.getById, executing query.');
+      let qparams = {BOID: req.params.BOID};
+      req.log.debug({query: query, params: qparams}, 'Handler.getById, executing query.');
 
-      let includeIgnored = req.params.ignored;
+      req.log.debug({includeIgnored: req.params.includeIgnored}, "ignored?");
+      let includeIgnored = req.params.includeIgnored == 'true';
 
       let statsQuery = 'SELECT k.name, k.description, v.itsKennzahlConfig,' +
         ' v.ITSBATCHCONFIG, min(v.numberValue) as min, max(v.numberValue) as max,' +
@@ -36,8 +38,6 @@ handler.getById = function (req, res, next) {
         ' k.levelMin, k.levelLowError, k.levelLowWarning, k.levelNormal, k.levelHighWarning, k.levelMax' +
         ' from SYBA.kennzahlvalue v' +
         ' INNER JOIN syba.kennzahlconfig k on v.itsKennzahlConfig = k.boid';
-
-      req.log.debug({params: req.params, includeIgnored: includeIgnored}, "ignored?");
 
       if (!includeIgnored) {
 
@@ -49,11 +49,11 @@ handler.getById = function (req, res, next) {
       }
       statsQuery += ' group by v.itsKennzahlConfig,  k.description, k.name, v.ITSBATCHCONFIG, k.levelMin, k.levelLowError, k.levelLowWarning, k.levelNormal, k.levelHighWarning, k.levelMax'
 
-      req.log.debug({query: statsQuery, params: req.params}, 'Handler.getById, executing query.');
+      req.log.debug({query: statsQuery, params: qparams}, 'Handler.getById, executing query.');
 
       Promise.all(
-        [conn.execute(query, req.params, {outFormat: oracledb.OBJECT}),
-        conn.execute(statsQuery, req.params, {outFormat: oracledb.OBJECT})]
+        [conn.execute(query, qparams, {outFormat: oracledb.OBJECT}),
+        conn.execute(statsQuery, qparams, {outFormat: oracledb.OBJECT})]
       )
         .then((results) => {
           conn.close();
