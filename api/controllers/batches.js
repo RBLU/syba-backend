@@ -101,7 +101,7 @@ handler.reloadBatchConfig = (req, res, next) => {
   Promise.all([oracleRestHandler.statementRunner(req, res, next, deleteRuns),
   oracleRestHandler.statementRunner(req, res, next, loadRuns)])
     .then((results) => {
-      req.log.debug({result: results}, "query executed successfully");
+      req.log.trace({result: results}, "query executed successfully");
       res.send({removed: results[0], added: results[1]});
       return next(null);
     })

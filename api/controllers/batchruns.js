@@ -49,9 +49,6 @@ handler.getById = function(req, res, next) {
 
           conn.execute(statsQuery, params, {outFormat: oracledb.OBJECT})
             .then((result) => {
-              if (result.rows.length == 0) {
-                return next(new restify.ResourceNotFoundError());
-              }
               run.kennzahlen = result.rows;
               conn.close();
               res.send(run);
