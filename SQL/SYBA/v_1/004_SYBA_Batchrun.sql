@@ -8,3 +8,4 @@ CREATE Table SYBA.BATCHRUN (
   started timestamp,
   ended timestamp
 )
+

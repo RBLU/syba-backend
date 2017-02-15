@@ -59,7 +59,7 @@ paths:
         default:
           description: Error
           schema:
-            $ref: "#/definitions/ErrorResponse"      
+            $ref: "#/definitions/ErrorResponse"
   /batchconfigs/{BOID}:
     x-swagger-router-controller: batches
     get:
@@ -120,6 +120,25 @@ paths:
                 description: Error
                 schema:
                   $ref: "#/definitions/ErrorResponse"
+  /batchconfigs/{BOID}/reload:
+    x-swagger-router-controller: batches
+    post:
+      description: Reloads a batchconfig completly, recalculates all runs and all kennzahlen
+      operationId: reloadBatchConfig
+      parameters:
+        - name: BOID
+          in: path
+          description: BOID der Batchconfig, die reloaded werden soll
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /batchconfigs/{ITSBATCHCONFIG}/kennzahlvalues/{ITSKENNZAHLCONFIG}:
     x-swagger-router-controller: kennzahlvalues
     get: 

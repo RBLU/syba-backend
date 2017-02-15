@@ -42,7 +42,7 @@ module.exports = {
                     functionName: functionName,
                     operationName: operationName,
                     path: path
-                  }, '"Controller Function not found: " + functionName + " in: " + controllerName, skipping this route');
+                  }, 'Controller Function not found: '+ functionName + ' in: ' + controllerName + ' , skipping this route');
                 } else {
                   operationName = operationName == 'delete' ? 'del':operationName;
                   server.log.info({
