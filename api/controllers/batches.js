@@ -47,7 +47,7 @@ handler.getById = function (req, res, next) {
        statsQuery +=
             ' where v.ITSBATCHCONFIG = :BOID';
       }
-      statsQuery += ' group by v.itsKennzahlConfig,  k.description, k.name, v.ITSBATCHCONFIG, k.levelMin, k.levelLowError, k.levelLowWarning, k.levelNormal, k.levelHighWarning, k.levelMax'
+      statsQuery += ' group by k.BOID, v.itsKennzahlConfig,  k.description, k.name, v.ITSBATCHCONFIG, k.levelMin, k.levelLowError, k.levelLowWarning, k.levelNormal, k.levelHighWarning, k.levelMax'
 
       req.log.debug({query: statsQuery, params: qparams}, 'Handler.getById, executing query.');
 
