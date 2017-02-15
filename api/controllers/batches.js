@@ -32,7 +32,7 @@ handler.getById = function (req, res, next) {
       req.log.debug({includeIgnored: req.params.includeIgnored}, "ignored?");
       let includeIgnored = req.params.includeIgnored == 'true';
 
-      let statsQuery = 'SELECT k.name, k.description, v.itsKennzahlConfig,' +
+      let statsQuery = 'SELECT k.BOID, k.name, k.description, v.itsKennzahlConfig,' +
         ' v.ITSBATCHCONFIG, min(v.numberValue) as min, max(v.numberValue) as max,' +
         ' avg(v.numberValue) as avg, stddev(v.numberValue) as stddev, median(v.numberValue) as median, count(1) as anzahl, ' +
         ' k.levelMin, k.levelLowError, k.levelLowWarning, k.levelNormal, k.levelHighWarning, k.levelMax' +
