@@ -310,6 +310,40 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /kennzahlen:
+    x-swagger-router-controller: kennzahlen
+    get:
+      description: Returns all known kennzahlen
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: array
+            items:
+              # a pointer to a definition
+              $ref: "#/definitions/User"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /kennzahlconfigs:
+    x-swagger-router-controller: kennzahlconfigs
+    get:
+      description: Returns all known kennzahlen
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: array
+            items:
+              # a pointer to a definition
+              $ref: "#/definitions/User"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
 
 # complex objects have schema definitions
 definitions:

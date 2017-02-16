@@ -12,7 +12,7 @@
   "db": {
     "user": "syba",
     "password": "syba",
-    "connectString": "10.1.1.183/XE",
+    "connectString": "retohome.youpers.org/XE",
     "poolAlias": "syba"
   },
   "linkTokenEncryption": {

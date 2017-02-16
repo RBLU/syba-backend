@@ -163,7 +163,6 @@ Runner.create(config, function (err, runner) {
   var port = process.env.PORT || runner.swagger.host.split(':')[1] || 10010;
   server.listen(port);
 
-  console.log("our runner is here");
   db.init()
     .then(() => {
       if (testReadyCb) {
