@@ -344,6 +344,68 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+    post:
+      description: posts a new kzconfig
+      parameters:
+        - name: kzconfig
+          in: body
+          description: the kzconfig to store
+          required: true
+          schema:
+            $ref: "#/definitions/Kzconfig"
+      responses:
+        "200":
+          description: Success
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /kennzahlconfigs/{BOID}:
+    x-swagger-router-controller: kennzahlconfigs
+    put:
+      description: updates an existing kennzahlconfig
+      parameters:
+        - name: BOID
+          in: path
+          description: boid of kzconfig to update
+          required: true
+          type: string
+        - name: batchrun
+          in: body
+          description: the payload data
+          required: true
+          schema:
+            $ref: "#/definitions/Kzconfig"
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: array
+            items:
+              # a pointer to a definition
+              $ref: "#/definitions/Kzconfig"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    delete:
+      description: deletes an existing kennzahlconfig
+      parameters:
+        - name: BOID
+          in: path
+          description: boid of kzconfig to update
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
 
 # complex objects have schema definitions
 definitions:
@@ -368,6 +430,24 @@ definitions:
       name: 
         type: string
       description: 
+        type: string
+      active:
+        type: integer
+  Kzconfig:
+    type: object
+    required:
+      - boid
+      - name
+      - description
+      - itsSyriusBatch
+    properties:
+      boid:
+        type: string
+      itsSyriusBatch:
+        type: string
+      name:
+        type: string
+      description:
         type: string
       active:
         type: integer
