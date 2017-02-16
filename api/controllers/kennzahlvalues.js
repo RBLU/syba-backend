@@ -39,7 +39,7 @@ handler.getKennzahlWithHistory = function(req, res, next) {
       };
       req.log.debug({query: query, params: qparams}, 'Handler.getKennzahlWithHistory, executing query.');
 
-      let includeIgnored = req.params.includeIgnored == 'true';
+      let includeIgnored = req.params.conn == 'true';
 
       let historyQuery = 'SELECT v.* from SYBA.KENNZAHLVALUE v';
 
