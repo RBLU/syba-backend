@@ -37,7 +37,7 @@ const getBatchConfigById = {
 const statsQueryStatementIncludeIgnored = {
   query: 'SELECT k.BOID, k.name, k.description, v.itsKennzahlConfig,' +
   ' v.ITSBATCHCONFIG, min(v.numberValue) as min, max(v.numberValue) as max,' +
-  ' avg(v.numberValue) as avg, stddev(v.numberValue) as stddev, median(v.numberValue) as median, count(1) as anzahl, ' +
+  ' avg(v.numberValue) as avg, stddev(v.numberValue) as stddev, median(v.numberValue) as median, count(1) as anzahl, min(v.started) as VON, max(v.started) as BIS, ' +
   ' k.levelMin, k.levelLowError, k.levelLowWarning, k.levelNormal, k.levelHighWarning, k.levelMax' +
   ' from SYBA.kennzahlvalue v' +
   ' INNER JOIN syba.kennzahlconfig k on v.itsKennzahlConfig = k.boid ',
