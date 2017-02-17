@@ -363,6 +363,24 @@ paths:
             $ref: "#/definitions/ErrorResponse"
   /kennzahlconfigs/{BOID}:
     x-swagger-router-controller: kennzahlconfigs
+    get:
+      description: Returns one Kennzahlconfig by id, includes basic stats about kzc
+      operationId: getById
+      parameters:
+        - name: BOID
+          in: path
+          description: boid of batch to fetch
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/Kzconfig"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
     put:
       description: updates an existing kennzahlconfig
       parameters:

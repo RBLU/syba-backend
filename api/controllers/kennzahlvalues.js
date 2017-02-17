@@ -5,6 +5,46 @@ var util = require('util'),
   oracledb = require('oracledb');
 
 
+
+const statsQueryStatementIncludeIgnored = {
+  query: 'SELECT k.BOID, k.name, k.description, v.itsKennzahlConfig,' +
+  ' v.ITSBATCHCONFIG, min(v.numberValue) as min, max(v.numberValue) as max,' +
+  ' avg(v.numberValue) as avg, stddev(v.numberValue) as stddev, median(v.numberValue) as median, count(1) as anzahl, min(v.started) as VON, max(v.started) as BIS, ' +
+  ' k.levelMin, k.levelLowError, k.levelLowWarning, k.levelNormal, k.levelHighWarning, k.levelMax' +
+  ' from SYBA.kennzahlvalue v' +
+  ' INNER JOIN syba.kennzahlconfig k on v.itsKennzahlConfig = k.boid ',
+  whereClause: 'v.ITSBATCHCONFIG = :BOID',
+  groupByClause: ' k.BOID, v.itsKennzahlConfig,  k.description, k.name, v.ITSBATCHCONFIG, ' +
+  'k.levelMin, k.levelLowError, k.levelLowWarning, k.levelNormal, k.levelHighWarning, k.levelMax',
+  paramsFn: (req) => {
+    return {BOID: req.params.BOID};
+  },
+  dbpool: 'syba'
+};
+
+const statsQueryStatementNormal = {
+  query: statsQueryStatementIncludeIgnored.query + ' INNER JOIN syba.batchrun br on v.itsBatchRun = br.boid',
+  whereClause: statsQueryStatementIncludeIgnored.whereClause + " AND nvl(br.ignoreInStats, '0') <> 1 ",
+  groupByClause: statsQueryStatementIncludeIgnored.groupByClause,
+  paramsFn: (req) => {
+    return {BOID: req.params.BOID};
+  },
+  dbpool: 'syba'
+
+};
+
+const statsQueryStatementIncludeIgnoredOneKzc = {
+  query: statsQueryStatementIncludeIgnored.query,
+  whereClause: "ITSKENNZAHLCONFIG = :ITSKENNZAHLCONFIG",
+  groupByClause: statsQueryStatementIncludeIgnored.groupByClause,
+  paramsFn: (req) => {
+    return {ITSKENNZAHLCONFIG: req.params.BOID};
+  },
+  dbpool: 'syba'
+};
+
+
+
 /*
  Once you 'require' a module you can reference the things that it exports.  These are defined in module.exports.
 
@@ -83,6 +123,12 @@ handler.getKennzahlWithHistory = function(req, res, next) {
     });
 
 };
+
+
+
+handler.statsQueryStatementIncludeIgnored = statsQueryStatementIncludeIgnored;
+handler.statsQueryStatementNormal = statsQueryStatementNormal;
+handler.statsQueryStatementIncludeIgnoredOneKzc = statsQueryStatementIncludeIgnoredOneKzc;
 
 module.exports = handler;
 

@@ -3,164 +3,123 @@ const _ = require('lodash');
 const restify = require('restify');
 const uuid = require('node-uuid');
 
-let getGenericHandler = function (tableName, poolname, filterClause, orderClause) {
+let getGenericQueries = (tableName, poolname, filterClause, orderClause) => {
+  return {
+    getById: {
+      query: "SELECT * from " + tableName,
+      whereClause: 'BOID= :BOID',
+      paramsFn: (req) => {
+        return {BOID: req.params.BOID}
+      },
+      dbpool: 'syba'
+    },
+    get: {
+      query: "SELECT * from " + tableName,
+      whereClause: filterClause,
+      orderByClause: orderClause,
+      paramsFn: (req) => {
+        return filterClause ? req.params : [];
+      },
+      dbpool: 'syba'
+    },
+    delete: {
+      query: "DELETE from " + tableName,
+      whereClause: 'BOID= :BOID',
+      paramsFn: (req) => {
+        return {BOID: req.params.BOID}
+      },
+      dbpool: 'syba'
+    },
 
+    put: {
+      query: (req) => {
+        let updateClause = _.reduce(req.body, function (result, value, key) {
+          return result + ' ' + key + '=' + value + ','
+        }, '');
+
+        if (_.endsWith(updateClause, ',')) {
+          updateClause = updateClause.substr(0, updateClause.length - 1);
+        }
+        return 'UPDATE ' + tableName + ' SET ' + updateClause;
+      },
+      whereClause: 'BOID= :BOID',
+      paramsFn: (req) => {
+        return {BOID: req.params.BOID}
+      },
+      dbpool: 'syba'
+    },
+    post: {
+      query: (req) => {
+        req.body.BOID = uuid.v4();
+        return "INSERT INTO " + tableName + "("
+          + _.keys(req.body).join(",") + ") VALUES (" +
+          _(req.body).keys().reduce(function (result, value) {
+            return result == '' ? result + ':' + value : result + ',:' + value
+          }, '')
+          + ")";
+      },
+      paramsFn: (req) => {
+        return req.body;
+      },
+      dbpool: 'syba'
+    }
+  };
+};
+
+let getGenericHandler = function (tableName, poolname, filterClause, orderClause) {
+  let queries = getGenericQueries(tableName, poolname, filterClause, orderClause);
   return {
     get: function (req, res, next) {
-      oracledb.getConnection(poolname)
-        .then(function (conn) {
-          let query = 'SELECT * FROM ' + tableName;
-          if (filterClause) {
-            query += ' WHERE ' + filterClause(req);
-          }
-
-          if (orderClause) {
-            query += ' ORDER BY ' + orderClause(req);
-          }
-          req.log.debug({query: query, parameter: req.params}, 'Handler.get, executing query');
-          conn.execute(query, filterClause ? req.params : [], {outFormat: oracledb.OBJECT, maxRows: 500})
-            .then((result) => {
-              req.log.debug({rows: result.rows.length}, "query executed successfully");
-              conn.close();
-              res.send(result.rows);
-              return next(null);
-            })
-            .catch((err) => {
-              conn.close();
-              req.log.error({err: err}, "Error executing qurey");
-              return next(err);
-            });
-        })
-        .catch(function (err) {
-          req.log.error({err: err}, "Error getting Db Connection");
-          return next(err);
+      statementRunner(req, res, next, queries.get)
+        .then((result) => {
+          req.log.debug({rows: result.rows.length}, "query executed successfully");
+          res.send(result.rows);
+          return next(null);
         });
     },
     getById: function (req, res, next) {
-      oracledb.getConnection(poolname)
-        .then(function (conn) {
-          const query = 'SELECT * from ' + tableName + ' where BOID=:BOID';
-          console.log('Handler.getById, executing query: ' + query);
-          conn.execute(query, req.params, {outFormat: oracledb.OBJECT})
-            .then((result) => {
-              console.log("getById Result: " + JSON.stringify(result));
-              conn.close();
-              if (result.rows.length == 0) {
-                return next(new restify.NotFoundError("Object not found with BOID: " + req.params.BOID));
-              } else if (result.rows.length > 1) {
-                return next(new restify.InternalServerError("got more than one object, not expected"));
-              }
-              res.send(result.rows[0]);
-              return next();
-            })
-            .catch((err) => {
-              conn.close();
-              return next(err);
-            });
-        })
-        .catch(function (err) {
-          return next(err);
+      statementRunner(req, res, next, queries.getById)
+        .then((result) => {
+          if (result.rows.length == 0) {
+            return next(new restify.NotFoundError("Object not found with BOID: " + req.params.BOID));
+          } else if (result.rows.length > 1) {
+            return next(new restify.InternalServerError("got more than one object, not expected"));
+          }
+          res.send(result.rows[0]);
+          return next();
         });
     },
     put: function (req, res, next) {
-      oracledb.getConnection(poolname)
-        .then(function (conn) {
-
-          let updateClause = _.reduce(req.body, function (result, value, key) {
-            return result + ' ' + key + '=' + value + ','
-          }, '');
-
-          if (_.endsWith(updateClause, ',')) {
-            updateClause = updateClause.substr(0, updateClause.length - 1);
-          }
-          let query = 'UPDATE ' + tableName + ' SET ' + updateClause + ' WHERE boid= :BOID'
-          req.log.debug({query: query, params: req.params}, 'Executing Update Query: ' + updateClause);
-          conn.execute(query, req.params, {outFormat: oracledb.OBJECT})
-            .then((result) => {
-              conn.commit()
-                .then(() => {
-                  req.log.debug({result: result}, 'Successfully Updated: ');
-                  conn.close();
-                  res.send(200, result);
-                  return next();
-                });
-            })
-            .catch((err) => {
-              conn.close();
-              return next(err);
-            });
-        })
-        .catch(function (err) {
-          return next(err);
+      statementRunner(req, res, next, queries.put)
+        .then((result) => {
+          req.log.debug({result: result}, 'PUT Successfully executed: ');
+          res.send(200, result);
+          return next();
         });
     },
     delete: function (req, res, next) {
-      oracledb.getConnection(poolname)
-        .then(function (conn) {
-          let query = 'DELETE FROM ' + tableName + " WHERE BOID= :BOID";
-          req.log.debug({query: query, params: req.params}, 'Handler.DELETE, executing query');
-          conn.execute(query, req.params, {outFormat: oracledb.OBJECT})
-            .then((result) => {
-              req.log.debug({result: result}, "DELETE, successfully executed");
-              conn.commit(function (err) {
-                if (err) {
-                  conn.close();
-                  return next(err);
-                }
-                res.send(result);
-                conn.close();
-                return next();
-              });
-            })
-            .catch((err) => {
-              conn.close();
-              return next(err);
-            });
-
-
+      statementRunner(req, res, next, queries.delete)
+        .then((result) => {
+          req.log.debug({result: result}, "DELETE, successfully executed");
+          res.send(result);
+          return next();
         });
     },
     post: function (req, res, next) {
-      oracledb.getConnection(poolname)
-        .then(function (conn) {
-
-          req.body.BOID = uuid.v4();
-          let query = "INSERT INTO " + tableName + "("
-            + _.keys(req.body).join(",") + ") VALUES (" +
-            _(req.body).keys().reduce(function (result, value) {
-              return result == '' ? result + ':' + value : result + ',:' + value
-            }, '')
-            + ")";
-          req.log.debug({query: query, params: req.body}, 'Handler.POST, executing query');
-          conn.execute(query, req.body, {outFormat: oracledb.OBJECT})
-            .then((result) => {
-              req.log.debug({result: result}, "POST, successfully executed");
-              conn.commit(function (err) {
-                if (err) {
-                  conn.close();
-                  return next(err);
-                }
-                res.send(req.body);
-                conn.close();
-                return next();
-              });
-            })
-            .catch((err) => {
-              conn.close();
-              return next(err);
-            });
-        })
-        .catch(function (err) {
-          return next(err);
+      statementRunner(req, res, next, queries.post)
+        .then((result) => {
+          req.log.debug({result: result}, "POST, successfully executed");
+          res.send(req.body);
+          return next();
         });
     }
-  }
+  };
 };
 
 function statementRunner(req, res, next, statementObject) {
   return oracledb.getConnection(statementObject.dbpool)
     .then(function (conn) {
-      let query = statementObject.query;
+      let query = _.isFunction(statementObject.query) ? statementObject.query(req) : statementObject.query;
       if (statementObject.whereClause) {
         if (_.isFunction(statementObject.whereClause)) {
           query += ' WHERE ' + statementObject.whereClause(req)
@@ -178,10 +137,14 @@ function statementRunner(req, res, next, statementObject) {
       }
 
       if (statementObject.orderClause) {
-        query += ' ORDER BY ' + orderClause(req);
+        if (_.isFunction(statementObject.orderClause)) {
+          query += ' ORDER BY ' + statementObject.orderClause;
+        } else {
+          query += ' ORDER BY ' + statementObject.orderClause(req);
+        }
       }
       let params = _.isFunction(statementObject.paramsFn) ? statementObject.paramsFn(req) : [];
-      req.log.debug({query: query, parameter: params}, 'Generic Statement Running, runnnig this statement');
+      req.log.debug({query: query, parameter: params}, 'Generic Statement Runner: Executing this statement');
       return conn
         .execute(query, params, {outFormat: oracledb.OBJECT, maxRows: 500})
         .then((result) => {
@@ -217,5 +180,6 @@ function statementRunner(req, res, next, statementObject) {
 
 module.exports = {
   getHandler: getGenericHandler,
-  statementRunner: statementRunner
+  statementRunner: statementRunner,
+  getQueries: getGenericQueries
 };

@@ -143,6 +143,14 @@ server.on('after', function (req, res, route, err) {
       statusCode: res.statusCode
     }, 'response body');
   }
+
+  if (req.log.trace()) {
+    let pool = require('oracledb').getPool('syba');
+    req.log.debug({poolstats: pool}, "OracleDb Connection Pool Stats");
+    if (pool.connectionsInUse > 0) {
+      req.log.error({onnectionsInUse: pool.connectionsInUse }, "Possible Connection Leak!!! check again with no parallel queries");
+    }
+  }
 });
 
 

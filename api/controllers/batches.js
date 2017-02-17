@@ -5,7 +5,8 @@ const util = require('util'),
   oracledb = require('oracledb'),
   restify = require('restify'),
   oracleRestHandler = require('../helpers/oracleRestHandler'),
-  uuid = require('node-uuid');
+  uuid = require('node-uuid'),
+  kennzahlvalues = require('./kennzahlvalues');
 
 const deleteRuns = {
   query: "DELETE FROM SYBA.BATCHRUN WHERE ITSBATCHCONFIG = :ITSBATCHCONFIG",
@@ -34,32 +35,7 @@ const getBatchConfigById = {
   dbpool: 'syba'
 };
 
-const statsQueryStatementIncludeIgnored = {
-  query: 'SELECT k.BOID, k.name, k.description, v.itsKennzahlConfig,' +
-  ' v.ITSBATCHCONFIG, min(v.numberValue) as min, max(v.numberValue) as max,' +
-  ' avg(v.numberValue) as avg, stddev(v.numberValue) as stddev, median(v.numberValue) as median, count(1) as anzahl, min(v.started) as VON, max(v.started) as BIS, ' +
-  ' k.levelMin, k.levelLowError, k.levelLowWarning, k.levelNormal, k.levelHighWarning, k.levelMax' +
-  ' from SYBA.kennzahlvalue v' +
-  ' INNER JOIN syba.kennzahlconfig k on v.itsKennzahlConfig = k.boid ',
-  whereClause: 'v.ITSBATCHCONFIG = :BOID',
-  groupByClause: ' k.BOID, v.itsKennzahlConfig,  k.description, k.name, v.ITSBATCHCONFIG, ' +
-  'k.levelMin, k.levelLowError, k.levelLowWarning, k.levelNormal, k.levelHighWarning, k.levelMax',
-  paramsFn: (req) => {
-    return {BOID: req.params.BOID};
-  },
-  dbpool: 'syba'
-};
 
-const statsQueryStatementNormal = {
-  query: statsQueryStatementIncludeIgnored.query + ' INNER JOIN syba.batchrun br on v.itsBatchRun = br.boid',
-  whereClause: statsQueryStatementIncludeIgnored.whereClause + " AND nvl(br.ignoreInStats, '0') <> 1 ",
-  groupByClause: statsQueryStatementIncludeIgnored.groupByClause,
-  paramsFn: (req) => {
-    return {BOID: req.params.BOID};
-  },
-  dbpool: 'syba'
-
-};
 
 
 
@@ -71,7 +47,8 @@ handler.getById = function (req, res, next) {
 
   Promise.all(
     [oracleRestHandler.statementRunner(req, res, next, getBatchConfigById),
-      oracleRestHandler.statementRunner(req, res, next, includeIgnored ? statsQueryStatementIncludeIgnored : statsQueryStatementNormal)]
+      oracleRestHandler.statementRunner(req, res, next,
+        includeIgnored ? kennzahlvalues.statsQueryStatementIncludeIgnored : kennzahlvalues.statsQueryStatementNormal)]
   )
     .then((results) => {
       req.log.trace({results: results}, 'query executed successfully');
