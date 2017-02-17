@@ -27,8 +27,8 @@ handler.getById = (req,res,next) => {
       return next(new restify.InternalServerError("multiple found with this BOID, corrupt data"));
     }
     let kzc = results[0].rows[0];
-    let kzStats = results[1].rows[0];
-    kzc.kzStats = kzStats;
+    let kzstats = results[1].rows[0];
+    kzc.kzstats = kzstats;
     res.send(kzc);
     return next();
   });
