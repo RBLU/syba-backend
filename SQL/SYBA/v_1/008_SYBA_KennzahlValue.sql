@@ -5,8 +5,8 @@ BEGIN
   itsKennzahlConfig VARCHAR (40),
   itsBatchConfig VARCHAR (40),
   itsSyriusBatch VARCHAR (40),
+  itsSyriusBatchlauf varchar (40),
   numberValue NUMBER (10, 2),
-  timestampValue TIMESTAMP,
   started TIMESTAMP,
   CONSTRAINT kz_boid unique(boid)
   )';

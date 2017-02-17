@@ -1,0 +1,40 @@
+
+/*
+  IMPORTANT: Grand the Syba User SELECT rights to each SYRIUSADM Table used in any Kennzahl explicitly, not via Role!
+ */
+
+
+CREATE OR REPLACE PROCEDURE SYBA.RECALCKZC (KZCBOID IN varchar) AS
+  kzc SYBA.KENNZAHLCONFIG%ROWTYPE;
+  kz SYBA.KENNZAHL%ROWTYPE;
+  BEGIN
+    SELECT * INTO kzc FROM SYBA.KENNZAHLCONFIG WHERE BOID = KZCBOID;
+    SELECT * INTO kz FROM SYBA.KENNZAHL WHERE BOID = kzc.ITSKENNZAHL;
+
+    Delete from syba.KENNZAHLVALUE where itsKennzahlConfig = KZCBOID;
+
+    FOR run
+    IN (SELECT BOID, ITSSYRIUSBATCH, itssyriusbatchlauf FROM SYBA.BATCHRUN WHERE ITSBATCHCONFIG = kzc.ITSBATCHCONFIG)
+    LOOP
+      EXECUTE IMMEDIATE 'begin ' || kz.sqlproc || '(:kzcboid, :BOID, :itsbatchconfig, :itssyriusbatch, :itssyriusbatchlauf ); END;'
+      USING kzc.BOID, run.BOID, kzc.ITSBATCHCONFIG, kzc.ITSSYRIUSBATCH, run.ITSSYRIUSBATCHLAUF;
+    END LOOP;
+  END;
+
+
+
+CREATE or REPLACE PROCEDURE SYBA.LAUFZEIT (KZCBOID IN varchar, RUNBOID IN varchar,
+                                             BCBOID in VARCHAR, SYRBATCHBOID in VARCHAR, SYRBLBOID in varchar) as
+  BEGIN
+    INSERT INTO SYBA.kennzahlvalue
+      SELECT SYS_GUID(), RUNBOID, KZCBOID, BCBOID, SYRBATCHBOID, SYRBLBOID, bl.STOPPED - bl.STARTED, bl.STARTED
+      FROM SYRIUSADM.BATCHLAUF bl where bl.BOID = SYRBLBOID;
+  END;
+
+CREATE or REPLACE PROCEDURE SYBA.KZWORKITEMS (KZCBOID IN varchar, RUNBOID IN varchar,
+                                              BCBOID in VARCHAR, SYRBATCHBOID in VARCHAR, SYRBLBOID in varchar) as
+  BEGIN
+    INSERT INTO SYBA.kennzahlvalue
+      SELECT SYS_GUID(), RUNBOID, KZCBOID, BCBOID, SYRBATCHBOID, SYRBLBOID, bl.NUMBEROFWORKITEMS, bl.STARTED
+      FROM SYRIUSADM.BATCHLAUF bl where bl.BOID = SYRBLBOID;
+  END;

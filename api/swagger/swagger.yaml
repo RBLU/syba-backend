@@ -424,6 +424,26 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /kennzahlconfigs/{BOID}/recalc:
+    x-swagger-router-controller: kennzahlconfigs
+    post:
+      description: recalculates a Kennzahl Config
+      operationId: recalcKennzahlConfigById
+      parameters:
+        - name: BOID
+          in: path
+          description: boid of batch to fetch
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/Kzconfig"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
 
 # complex objects have schema definitions
 definitions:

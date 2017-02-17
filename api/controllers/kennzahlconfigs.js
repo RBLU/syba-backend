@@ -7,8 +7,20 @@ const util = require('util'),
   kennzahlvalues = require('./kennzahlvalues');
 
 
-let handler = oracleRestHandler.getHandler('SYBA.KENNZAHLCONFIG', 'syba');
-let queries = oracleRestHandler.getQueries('SYBA.KENNZAHLCONFIG', 'syba');
+const handler = oracleRestHandler.getHandler('SYBA.KENNZAHLCONFIG', 'syba');
+const queries = oracleRestHandler.getQueries('SYBA.KENNZAHLCONFIG', 'syba');
+
+
+
+const recalcQuery = {
+  query: "BEGIN SYBA.RECALCKZC(:KZCBOID); END;",
+  paramsFn: (req) => {
+    return {KZCBOID: req.params.BOID}
+  },
+  dbpool: 'syba'
+};
+
+
 
 handler.getById = (req,res,next) => {
   Promise.all([
@@ -32,6 +44,14 @@ handler.getById = (req,res,next) => {
     res.send(kzc);
     return next();
   });
+};
+
+handler.recalcKennzahlConfigById = (req, res, next) => {
+  oracleRestHandler.statementRunner(req, res, next, recalcQuery)
+    .then((results) => {
+      res.send(results);
+      return next();
+    });
 };
 
 module.exports = handler;
