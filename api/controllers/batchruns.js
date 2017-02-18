@@ -20,7 +20,7 @@ const util = require('util'),
  we specify that in the exports of this module that 'hello' maps to the function named 'hello'
  */
 let handler  = require('../helpers/oracleRestHandler')
-  .getHandler('SYBA.BATCHRUN', 'syba', () => {return 'ITSBATCHCONFIG=:ITSBATCHCONFIG';}, () => {return 'STARTED DESC';});
+  .getHandler('SYBA.BATCHRUN', 'syba', 'ITSBATCHCONFIG=:ITSBATCHCONFIG', 'STARTED DESC');
 
 handler.getById = function(req, res, next) {
 

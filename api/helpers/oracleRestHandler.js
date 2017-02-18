@@ -34,7 +34,7 @@ let getGenericQueries = (tableName, poolname, filterClause, orderClause) => {
     put: {
       query: (req) => {
         let updateClause = _.reduce(req.body, function (result, value, key) {
-          return result + ' ' + key + '=' + value + ','
+          return result + ' ' + key + '= :' + key + ','
         }, '');
 
         if (_.endsWith(updateClause, ',')) {
@@ -44,7 +44,8 @@ let getGenericQueries = (tableName, poolname, filterClause, orderClause) => {
       },
       whereClause: 'BOID= :BOID',
       paramsFn: (req) => {
-        return {BOID: req.params.BOID}
+        // TODO: Check whether body.BOID == req.params.BOID!!!
+        return req.body
       },
       dbpool: 'syba'
     },
@@ -136,11 +137,11 @@ function statementRunner(req, res, next, statementObject) {
         }
       }
 
-      if (statementObject.orderClause) {
-        if (_.isFunction(statementObject.orderClause)) {
-          query += ' ORDER BY ' + statementObject.orderClause;
+      if (statementObject.orderByClause) {
+        if (_.isFunction(statementObject.orderByClause)) {
+          query += ' ORDER BY ' + statementObject.orderByClause(req);
         } else {
-          query += ' ORDER BY ' + statementObject.orderClause(req);
+          query += ' ORDER BY ' + statementObject.orderByClause;
         }
       }
       let params = _.isFunction(statementObject.paramsFn) ? statementObject.paramsFn(req) : [];

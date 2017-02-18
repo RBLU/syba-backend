@@ -56,7 +56,8 @@ const kzHistoryQueryIncludeIgnored = {
 const kzHistoryQueryNormal = {
   query: kzHistoryQueryIncludeIgnored.query + ' INNER JOIN syba.batchrun br on v.itsBatchRun = br.boid',
   paramsFn: kzHistoryQueryIncludeIgnored.paramsFn,
-  whereClause: kzHistoryQueryIncludeIgnored.whereClause + ' AND nvl(br.ignoreInStats, \'0\') <> 1 '
+  whereClause: kzHistoryQueryIncludeIgnored.whereClause + ' AND nvl(br.ignoreInStats, \'0\') <> 1 ',
+  orderByClause: kzHistoryQueryIncludeIgnored.orderByClause
 };
 
 let filterClause = () => {

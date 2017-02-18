@@ -20,7 +20,7 @@ const util = require('util'),
  we specify that in the exports of this module that 'hello' maps to the function named 'hello'
  */
 let handler  = require('../helpers/oracleRestHandler')
-  .getHandler('SYRIUSADM.BATCH', 'syriusadm', null, (req) => {return 'BEZEICHNUNGDT ASC';});
+  .getHandler('SYRIUSADM.BATCH', 'syriusadm', null, 'BEZEICHNUNGDT ASC');
 
 
 module.exports = handler;
