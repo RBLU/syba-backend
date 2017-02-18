@@ -117,7 +117,7 @@ let getGenericHandler = function (tableName, poolname, filterClause, orderClause
 };
 
 function statementRunner(req, res, next, statementObject) {
-  return oracledb.getConnection(statementObject.dbpool)
+  return oracledb.getConnection(statementObject.dbpool || 'syba')
     .then(function (conn) {
       let query = _.isFunction(statementObject.query) ? statementObject.query(req) : statementObject.query;
       if (statementObject.whereClause) {
