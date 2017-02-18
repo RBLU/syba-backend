@@ -91,7 +91,7 @@ handler.getKennzahlWithHistory = function(req, res, next) {
           ' where v.ITSKENNZAHLCONFIG = :ITSKENNZAHLCONFIG';
       }
       historyQuery +=
-        ' order by v.STARTED ASC';
+        ' order by v.STARTED DESC';
       req.log.debug({query: historyQuery, params: qparams}, 'Handler.getById, executing query.');
 
       Promise.all(
