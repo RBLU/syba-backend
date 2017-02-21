@@ -5,9 +5,13 @@ var restify = require('restify');
 var swaggerRestify = require('./api/helpers/swagger-restify');
 var db = require('./database');
 const _ = require('lodash');
+const passport = require('passport');
+
 
 var config = require('./config/config');
 config.appRoot = __dirname; // required config
+const auth = require('./api/helpers/auth').handlers(config);
+
 
 var logger = require('./api/helpers/log').getLogger(config);
 
@@ -158,8 +162,10 @@ server.use(restify.requestLogger());
 server.use(restify.acceptParser(server.acceptable));
 server.use(restify.queryParser());
 server.use(restify.bodyParser({mapParams: false}));
-//server.use(passport.initialize());
+server.use(passport.initialize());
 server.use(restify.fullResponse());
+
+auth.setupPassport(passport);
 
 
 Runner.create(config, function (err, runner) {
@@ -167,7 +173,8 @@ Runner.create(config, function (err, runner) {
     throw err;
   }
 
-  swaggerRestify.register(server, runner);
+  swaggerRestify.register(server, runner, auth.roleBasedAuth);
+
   var port = process.env.PORT || runner.swagger.host.split(':')[1] || 10010;
   server.listen(port);
 

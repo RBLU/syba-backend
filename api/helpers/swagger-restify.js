@@ -8,7 +8,7 @@ function convertSwaggerPathToRestify(pathNameSwagger) {
 }
 
 module.exports = {
-  register: function (server, runner) {
+  register: function (server, runner, authenticateAccessFn) {
 
     _.each(runner.swagger.paths, (pathConfig, pathNameSwagger) => {
       let controllerName = '../controllers/' + pathConfig[SWAGGER_CONTROLLER_KEY];
@@ -34,8 +34,9 @@ module.exports = {
             _.each(pathConfig, (operationConfig, operationName) => {
 
               let functionName = pathConfig[operationName].operationId || operationName;
-              if (!operationName.startsWith('x-')) {
+              const accessLevel =  pathConfig[operationName]['x-accessLevel'] || 'al_all';
 
+              if (!operationName.startsWith('x-')) {
                 if (!_.isFunction(controller[functionName])) {
                   server.log.error({
                     controllerName: controllerName,
@@ -49,9 +50,19 @@ module.exports = {
                     path: path,
                     operation: operationName,
                     controller: controllerName,
-                    functionName: functionName
+                    functionName: functionName,
+                    accessLevel: accessLevel
                   }, "registering route");
-                  server[operationName](path, controller[functionName]);
+
+                  const handlers = [];
+
+                  if (authenticateAccessFn) {
+                    handlers.push(authenticateAccessFn(accessLevel))
+                  }
+                  handlers.push(controller[functionName]);
+
+                  // really do the operation
+                  server[operationName](path, handlers);
                 }
               }
             });

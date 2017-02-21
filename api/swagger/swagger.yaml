@@ -20,6 +20,19 @@ produces:
 paths:
   /swagger:
     x-swagger-pipe: swagger_raw
+  /login:
+    x-swagger-router-controller: auth
+    post:
+      description: logs in a user, authenticates the user using all supported Auth-Mechanisms-returns a Bearer Token for all token that can be used for all other API endpoints
+      x-accessLevel: al_user
+      responses:
+        "200":
+          description: Success
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /batchconfigs:
     x-swagger-router-controller: batches
     get: 
@@ -294,7 +307,7 @@ paths:
             $ref: "#/definitions/ErrorResponse"
 
   /users:
-    x-swagger-router-controller: batches
+    x-swagger-router-controller: users
     get: 
       description: Returns all known users
       responses:
@@ -303,6 +316,28 @@ paths:
           schema:
             type: array
             items: 
+              # a pointer to a definition
+              $ref: "#/definitions/User"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    post:
+      description: Posts a new user
+      operationId: postUser
+      x-accessLevel: al_systemadmin
+      parameters:
+        - name: user
+          in: body
+          description: the user to store
+          required: true
+          schema:
+            $ref: "#/definitions/User"
+      responses:
+        "200":
+          description: Success
+          schema:
               # a pointer to a definition
               $ref: "#/definitions/User"
         # responses may fall through to errors
