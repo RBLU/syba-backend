@@ -41,7 +41,7 @@ handler.postUser = function postUser(req, res, next) {
 
     oracleRestHandler.statementRunner(req, res, next, oracleRestHandler.getQueries('SYBA.LOCALUSER', 'syba').post)
       .then((result) => {
-        delete user.HASHEDPASSWORD
+        delete user.HASHEDPASSWORD;
         res.send(user);
         return next();
       })

@@ -136,6 +136,7 @@ function getAuthHandlers(config) {
           {USERNAME: username},
           {outFormat: oracleDb.OBJECT, maxRows: 500})
           .then((result) => {
+            conn.close();
             if (result.rows.length == 0) {
               return done(null, false);
             } else {
@@ -154,6 +155,7 @@ function getAuthHandlers(config) {
             }
           })
           .catch((err) => {
+            conn.close();
             return done(err);
           })
       })
@@ -178,6 +180,7 @@ function getAuthHandlers(config) {
               {USERNAME: username},
               {outFormat: oracleDb.OBJECT, maxRows: 500})
               .then((result) => {
+                conn.close();
                 if (result.rows.length == 0) {
                   return done(null, false);
                 } else {
@@ -186,6 +189,7 @@ function getAuthHandlers(config) {
                 }
               })
               .catch((err) => {
+                conn.close();
                 return done(err);
               })
           })
