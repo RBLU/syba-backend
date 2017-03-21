@@ -33,6 +33,10 @@ let getGenericQueries = (tableName, poolname, filterClause, orderClause) => {
 
     put: {
       query: (req) => {
+        // remove BOID from body if needed, one cannot update the BOID of an object
+        if (req.body.BOID) {
+          delete req.body.BOID;
+        }
         let updateClause = _.reduce(req.body, function (result, value, key) {
           return result + ' ' + key + '= :' + key + ','
         }, '');
@@ -44,8 +48,10 @@ let getGenericQueries = (tableName, poolname, filterClause, orderClause) => {
       },
       whereClause: 'BOID= :BOID',
       paramsFn: (req) => {
-        // TODO: Check whether body.BOID == req.params.BOID!!!
-        return req.body
+        // we use the BOID from the URL to load the object
+        const params = _.clone(req.body);
+        params.BOID = req.params.BOID;
+        return params;
       },
       dbpool: 'syba'
     },
