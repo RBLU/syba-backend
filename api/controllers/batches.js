@@ -18,9 +18,26 @@ const deleteRuns = {
 const loadRuns = {
   query: "insert into syba.BATCHRUN " +
   "SELECT SYS_GUID(), :ITSBATCHCONFIG, :ITSSYRIUSBATCH, bl.boid, NULL, NULL, bl.started, bl.stopped " +
-  "FROM syriusadm.BATCHLAUF bl where bl.ITSBATCHLAUFBATCH = :ITSSYRIUSBATCH and bl.replaced > sysdate ",
+  "FROM syriusadm.BATCHLAUF bl",
   paramsFn: (req) => {
-    return {ITSBATCHCONFIG: req.params.BOID, ITSSYRIUSBATCH: req.params.ITSSYRIUSBATCH}
+    let params = {ITSBATCHCONFIG: req.params.BOID, ITSSYRIUSBATCH: req.params.batchConfig.ITSSYRIUSBATCH};
+    if (req.params.batchConfig.FROMDATE) {
+      params.FROMDATE =  new Date(req.params.batchConfig.FROMDATE);
+    }
+    if (req.params.batchConfig.TODATE) {
+      params.TODATE =  new Date(req.params.batchConfig.TODATE);
+    }
+    return params;
+  },
+  whereClause: (req) => {
+    let clause = 'bl.ITSBATCHLAUFBATCH = :ITSSYRIUSBATCH and bl.replaced > sysdate ';
+    if (req.params.batchConfig.FROMDATE) {
+      clause += 'and bl.STARTED >= :FROMDATE ';
+    }
+    if (req.params.batchConfig.TODATE) {
+      clause += ' and bl.STARTED <= :TODATE ';
+    }
+    return clause;
   },
   dbpool: 'syba',
 };
@@ -64,13 +81,19 @@ handler.getById = function (req, res, next) {
 };
 
 handler.reloadBatchConfig = (req, res, next) => {
-  Promise.all([oracleRestHandler.statementRunner(req, res, next, deleteRuns),
-  oracleRestHandler.statementRunner(req, res, next, loadRuns)])
-    .then((results) => {
-      req.log.trace({result: results}, "query executed successfully");
-      res.send({removed: results[0], added: results[1]});
-      return next(null);
-    })
+  oracleRestHandler.statementRunner(req, res, next, getBatchConfigById)
+    .then((batchConfig) => {
+      req.params.batchConfig = batchConfig.rows[0];
+
+      Promise.all([oracleRestHandler.statementRunner(req, res, next, deleteRuns),
+        oracleRestHandler.statementRunner(req, res, next, loadRuns)])
+        .then((results) => {
+          req.log.trace({result: results}, "query executed successfully");
+          res.send({removed: results[0], added: results[1]});
+          return next(null);
+        })
+    });
+
 };
 
 

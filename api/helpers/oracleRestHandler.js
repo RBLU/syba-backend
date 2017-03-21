@@ -2,6 +2,7 @@ const oracledb = require('oracledb');
 const _ = require('lodash');
 const restify = require('restify');
 const uuid = require('node-uuid');
+const moment = require('moment');
 
 let getGenericQueries = (tableName, poolname, filterClause, orderClause) => {
   return {
@@ -49,7 +50,16 @@ let getGenericQueries = (tableName, poolname, filterClause, orderClause) => {
       whereClause: 'BOID= :BOID',
       paramsFn: (req) => {
         // we use the BOID from the URL to load the object
-        const params = _.clone(req.body);
+        const params = {};
+        _.each(req.body, (value, key) => {
+          // try whether value is a valid ISO_8601 moment, then convert to JS Date, because the
+          // Oracle Driver wants date values as Dates
+          if (moment(value, moment.ISO_8601).isValid()) {
+            params[key] = moment(value, moment.ISO_8601).toDate();
+          } else {
+            params[key] = value;
+          }
+        });
         params.BOID = req.params.BOID;
         return params;
       },
