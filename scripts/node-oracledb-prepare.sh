@@ -7,8 +7,8 @@ if [ -f  ~/.oracle/instantclient/libclntsh.so ]; then
 else
     mkdir -p ~/.oracle
     cd ~/.oracle
-    wget https://hc.youpers.com/assets/instantclient-basiclite-linux.x64-12.1.0.2.0.zip
-    wget https://hc.youpers.com/assets/instantclient-sdk-linux.x64-12.1.0.2.0.zip
+    wget --no-check-certificate https://hc.youpers.com/assets/instantclient-basiclite-linux.x64-12.1.0.2.0.zip
+    wget --no-check-certificate https://hc.youpers.com/assets/instantclient-sdk-linux.x64-12.1.0.2.0.zip
     unzip instantclient-basiclite-linux.x64-12.1.0.2.0.zip
     unzip instantclient-sdk-linux.x64-12.1.0.2.0.zip
     mv instantclient_12_1 instantclient
