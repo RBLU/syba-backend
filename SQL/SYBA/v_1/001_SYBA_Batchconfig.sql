@@ -4,8 +4,8 @@ BEGIN
   itsSyriusBatch varchar(40),
   name varchar(100),
   description varchar(100),
-  FROMDATE date,
-  TODATE date,
+  fromDate date,
+  toDate date,
   active number(1),
   CONSTRAINT bc_boid unique(boid))';
 END;

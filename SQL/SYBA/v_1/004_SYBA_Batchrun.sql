@@ -6,6 +6,7 @@ CREATE Table SYBA.BATCHRUN (
   usercomment varchar(4000),
   ignoreInStats number(1),
   started timestamp,
-  ended timestamp
+  ended timestamp,
+  status varchar(40)
 )
 
